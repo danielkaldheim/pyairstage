@@ -1,0 +1,5 @@
+certifi==2023.5.7
+chardet==3.0.4
+idna==2.8
+urllib3==1.26.15
+aiohttp==3.8.4

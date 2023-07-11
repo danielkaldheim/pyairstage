@@ -1,0 +1,218 @@
+import logging
+import time
+import os
+import json
+import uuid
+import asyncio
+import aiohttp
+
+
+HEADER_CONTENT_TYPE = "Content-Type"
+HEADER_USER_AGENT = "User-Agent"
+HEADER_VALUE_CONTENT_TYPE = "application/json"
+HEADER_AUTHORIZATION = "Authorization"
+
+_LOGGER = logging.getLogger(__name__)
+
+
+class ApiError(Exception):
+    """Airstage Error"""
+
+
+def _api_headers(access_token: str | None = None) -> dict[str, str]:
+    headers = {
+        HEADER_CONTENT_TYPE: HEADER_VALUE_CONTENT_TYPE,
+        HEADER_USER_AGENT: "Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148",
+    }
+
+    if access_token:
+        headers[HEADER_AUTHORIZATION] = "Bearer " + access_token
+
+    return headers
+
+
+class Api:
+    def __init__(
+        self,
+        region: str = "eu",
+        tokenpath: str = "token.json",
+        session: aiohttp.ClientSession = None,
+        retry: int = 5,
+        username: str | None = None,
+        password: str | None = None,
+        country: str | None = None,
+    ) -> None:
+        if session is None:
+            session = aiohttp.ClientSession()
+        self.region = region
+        self.osVersion = "iOS 16.6"
+        self.session = session
+        self.retry = retry
+        self.deviceToken = (
+            "daKkE967jU78oX5UsuE8dc:APA91bGNPMLBZFdiKDo97U5Oxtg7bJyGhdMbh8e37SKRE2hq1i2HIDooGDfoeiCyqaWd3H5FdgmfOemHzPpZuvE2RALkUod-5O-6lnNHIeuQ0VSxjYKyav9ph7D3aqdokGn6LGNlo372",
+        )
+        self.username = username
+        self.password = password
+        self.country = country
+
+        if region == "eu":
+            self._SIGNIN_BODY = '{"user": {"email": "%s","password": "%s","country": "%s","language": "en","deviceToken": "%s","ssid": "%s","osVersion": "%s"}}'
+            self._REFRESH_BODY = '{"user": {"refreshToken": "%s"}}'
+            self._SET_PARAMETER_BODY = '{"deviceSubId": 0, "parameters": [{"name": "%s","desiredValue": "%s"}]}'
+            self._API_GET_ACCESS_TOKEN_URL = (
+                "https://bke.euro.airstagelight.com/apiv1/users/sign_in"
+            )
+            self._API_REFRESH_TOKEN_URL = (
+                "https://bke.euro.airstagelight.com/apiv1/users/me/refresh_token"
+            )
+            self._API_BASE_URL = "https://bke.euro.airstagelight.com/apiv1/"
+        elif region == "cn":
+            raise ApiError("CN region not supported yet")
+        else:
+            raise ApiError("US region not supported yet")
+
+        self._ACCESS_TOKEN_FILE = tokenpath
+
+    async def authenticate(self, refresh_token: str | None = None) -> str:
+        if refresh_token:
+            response = await self.async_call_api(
+                "POST",
+                self._API_REFRESH_TOKEN_URL,
+                json=self._REFRESH_BODY % (refresh_token),
+                headers=_api_headers(),
+            )
+        else:
+            if not self.username:
+                raise ApiError("username should not be empty")
+
+            response = await self.async_call_api(
+                "POST",
+                self._API_GET_ACCESS_TOKEN_URL,
+                json=self._SIGNIN_BODY
+                % (
+                    self.username,
+                    self.password,
+                    self.country,
+                    self.deviceToken,
+                    str(uuid.uuid4()),
+                    self.osVersion,
+                ),
+                headers=_api_headers(),
+            )
+
+        response["time"] = int(time.time())
+        access_token = response["accessToken"]
+
+        f = open(self._ACCESS_TOKEN_FILE, "w", encoding="utf8")
+        f.write(json.dumps(response))
+        return access_token
+
+    async def get_devices(self):
+        access_token = await self._read_token()
+        response = await self.async_call_api(
+            "GET",
+            f"{self._API_BASE_URL}/devices/all",
+            headers=_api_headers(access_token=access_token),
+        )
+
+        devices = {}
+        if response["devices"]:
+            for device in response["devices"]:
+                devices[device["deviceId"]] = device
+
+        _LOGGER.debug(devices)
+
+        return devices
+
+    async def set_parameter(self, dsn: str, name: str, value: str):
+        access_token = await self._read_token()
+        response = await self.async_call_api(
+            "POST",
+            f"{self._API_BASE_URL}/devices/{dsn}/set_parameters_request",
+            json=self._SET_PARAMETER_BODY % (name, value),
+            headers=_api_headers(access_token=access_token),
+        )
+        _LOGGER.debug(self._SET_PARAMETER_BODY % (name, value))
+
+        _LOGGER.debug(response)
+
+        return response
+
+    async def async_call_api(
+        self,
+        method: str,
+        url: str,
+        access_token: str | None = None,
+        retry: int = None,
+        **kwargs,
+    ):
+        retry = retry or self.retry
+        data = {}
+        count = 0
+        error = None
+
+        payload = kwargs.get("json")
+
+        if "headers" not in kwargs:
+            if access_token:
+                kwargs["headers"] = _api_headers(access_token=access_token)
+            else:
+                kwargs["headers"] = _api_headers()
+
+        if method.lower() == "post":
+            if not payload:
+                raise ApiError(f"Post method needs a request body!")
+
+        while count < retry:
+            count += 1
+            try:
+                async with self.session.request(
+                    method,
+                    url,
+                    timeout=aiohttp.ClientTimeout(total=4),
+                    data=payload,
+                    headers=kwargs.get("headers"),
+                ) as resp:
+                    assert resp.status == 200
+                    data = await resp.json(content_type=None)
+                    return data
+            except (
+                aiohttp.ClientError,
+                aiohttp.ClientConnectorError,
+                aiohttp.client_exceptions.ServerDisconnectedError,
+                ConnectionResetError,
+            ) as err:
+                error = err
+            except asyncio.TimeoutError:
+                error = "Connection timed out."
+            except AssertionError:
+                error = "Response status not 200."
+                break
+            except SyntaxError as err:
+                error = "Invalid response"
+                break
+
+            await asyncio.sleep(1)
+        raise ApiError(
+            f"No valid response after {count} failed attempt{['','s'][count>1]}. Last error was: {error}"
+        )
+
+    async def _read_token(self, access_token_file=None) -> str | None:
+        if not access_token_file:
+            access_token_file = self._ACCESS_TOKEN_FILE
+        if (
+            os.path.exists(access_token_file)
+            and os.stat(access_token_file).st_size != 0
+        ):
+            f = open(access_token_file, "r", encoding="utf8")
+            access_token_file_content = f.read()
+            data = json.loads(access_token_file_content)
+            now = int(time.time())
+            if data["accessToken"]:
+                access_token = data["accessToken"]
+
+                if now < (int(data["time"]) + int(data["expiresIn"])):
+                    return access_token
+                os.remove(access_token_file)
+                return await self.authenticate(refresh_token=data["refreshToken"])
+        return await self.authenticate()
