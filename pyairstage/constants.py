@@ -126,6 +126,7 @@ class ACParameter(enum.Enum):
 
     POWERFUL_MODE = "iu_powerful"
     ECONOMY_MODE = "iu_economy"
+    ENERGY_SAVE_FAN = "iu_fan_ctrl"
     TARGET_TEMPERATURE = "iu_set_tmp"
     INDOOR_TEMPERATURE = "iu_indoor_tmp"
     OUTDOOR_TEMPERATURE = "iu_outdoor_tmp"
@@ -133,6 +134,8 @@ class ACParameter(enum.Enum):
     REFRESH_READ_PROPERTIES = "get_prop"
     VERTICAL_SWING = "iu_af_swg_vrt"
     VERTICAL_DIRECTION = "iu_af_dir_vrt"
+
+    OUTDOOR_LOW_NOISE = "ou_low_noise"
 
     # # below are readonly properties
     # DISPLAY_TEMPERATURE = "display_temperature"
