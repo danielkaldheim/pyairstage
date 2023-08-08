@@ -2,6 +2,7 @@ import logging
 import time
 import os
 import json
+from typing import Any, Coroutine
 import uuid
 import asyncio
 import aiohttp
@@ -12,11 +13,24 @@ HEADER_USER_AGENT = "User-Agent"
 HEADER_VALUE_CONTENT_TYPE = "application/json"
 HEADER_AUTHORIZATION = "Authorization"
 
-_LOGGER = logging.getLogger(__name__)
+
+class AirstageApi:
+    """Airstage API"""
+
+    async def get_devices(self) -> Coroutine[Any, Any, dict]:
+        """Get account devices"""
+        pass
+
+    async def set_parameter(self, dsn: str, name: str, value: str):
+        """Get set device parameter"""
+        pass
 
 
 class ApiError(Exception):
     """Airstage Error"""
+
+
+_LOGGER = logging.getLogger(__name__)
 
 
 def _api_headers(access_token: str | None = None) -> dict[str, str]:
@@ -31,7 +45,7 @@ def _api_headers(access_token: str | None = None) -> dict[str, str]:
     return headers
 
 
-class Api:
+class ApiCloud(AirstageApi):
     def __init__(
         self,
         region: str = "eu",
@@ -216,3 +230,198 @@ class Api:
                 os.remove(access_token_file)
                 return await self.authenticate(refresh_token=data["refreshToken"])
         return await self.authenticate()
+
+
+class ApiLocal(AirstageApi):
+    _GET_PARAMETER_BODY = '{"device_id": "%s","device_sub_id": %i,"req_id": "","modified_by": "","set_level": "%s","list": %s }'
+    _GET_PARAMETER_BODY = ""
+
+    def __init__(
+        self,
+        session: aiohttp.ClientSession = None,
+        retry: int = 5,
+        device_id: str | None = None,
+        ip_address: str | None = None,
+    ) -> None:
+        if session is None:
+            session = aiohttp.ClientSession()
+
+        self.session = session
+        self.retry = retry
+        self.device_id = device_id
+        self.ip_address = ip_address
+
+    async def get_devices(self):
+        # wlanInfo = await self.get_parameters(
+        #     [
+        #         "wla_main_ver",
+        #         "wla_model",
+        #         "iu_dev_cap",
+        #         "iu_op_stat",
+        #         "iu_monitor1",
+        #         "wla_cloud_mode",
+        #         "wla_led",
+        #     ],
+        #     device_sub_id=1,
+        # )
+
+        modelInfo = await self.get_parameters(
+            [
+                "iu_model",
+            ],
+        )
+
+        acInfo = await self.get_parameters(
+            [
+                "iu_wifi_led",
+                "iu_af_inc_hrz",
+                "iu_af_inc_vrt",
+                "iu_indoor_tmp",
+                "iu_outdoor_tmp",
+                "iu_hmn_det",
+                "iu_main_ver",
+                "iu_eep_ver",
+                "iu_has_upd_main",
+                "iu_has_upd_eep",
+                "iu_fld_set80",
+            ],
+        )
+
+        modeInfo = await self.get_parameters(
+            [
+                "iu_onoff",
+                "iu_op_mode",
+                "iu_fan_spd",
+                "iu_set_tmp",
+                "iu_af_dir_vrt",
+                "iu_af_swg_vrt",
+                "iu_af_dir_hrz",
+                "iu_af_swg_hrz",
+                "ou_low_noise",
+                "iu_fan_ctrl",
+                "iu_hmn_det_auto_save",
+                "iu_min_heat",
+                "iu_powerful",
+                "iu_economy",
+                "iu_err_code",
+                "iu_demand",
+                "iu_fltr_sign_reset",
+            ],
+        )
+
+        parameters = modelInfo | acInfo | modeInfo
+
+        formattedParameters = []
+        for key in parameters:
+            formattedParameters.append(
+                {"name": key, "value": parameters[key], "modifiedAt": ""}
+            )
+
+        devices = {}
+
+        devices[self.device_id] = {
+            "isSubuser": False,
+            "deviceId": self.device_id,
+            "deviceName": self.device_id,
+            "model": modelInfo["iu_model"],
+            "parameters": formattedParameters,
+        }
+
+        _LOGGER.debug(devices)
+
+        return devices
+
+    async def get_parameters(
+        self, value: [], device_sub_id: int = 0, level: str = "03"
+    ):
+        jsonPayload = {
+            "device_id": self.device_id,
+            "device_sub_id": device_sub_id,
+            "req_id": "",
+            "modified_by": "",
+            "set_level": level,
+            "list": value,
+        }
+
+        response = await self.async_call_api(
+            "POST", f"http://{self.ip_address}/GetParam", json=json.dumps(jsonPayload)
+        )
+        _LOGGER.debug(json.dumps(jsonPayload))
+
+        _LOGGER.debug(response)
+
+        if "result" in response and response["result"] == "OK":
+            return response["value"]
+
+        raise ApiError(f"Get parameter failed")
+
+    async def set_parameter(self, dsn: str, name: str, value: str):
+        jsonPayload = {
+            "device_id": dsn,
+            "device_sub_id": 0,
+            "req_id": "",
+            "modified_by": "",
+            "set_level": "02",
+            "value": {str(name): str(value)},
+        }
+
+        response = await self.async_call_api(
+            "POST", f"http://{self.ip_address}/SetParam", json=json.dumps(jsonPayload)
+        )
+        _LOGGER.debug(json.dumps(jsonPayload))
+
+        _LOGGER.debug(response)
+
+        return response
+
+    async def async_call_api(
+        self,
+        method: str,
+        url: str,
+        retry: int = None,
+        **kwargs,
+    ):
+        retry = retry or self.retry
+        data = {}
+        count = 0
+        error = None
+
+        payload = kwargs.get("json")
+
+        if method.lower() == "post":
+            if not payload:
+                raise ApiError(f"Post method needs a request body!")
+
+        while count < retry:
+            count += 1
+            try:
+                async with self.session.request(
+                    method,
+                    url,
+                    timeout=aiohttp.ClientTimeout(total=4),
+                    data=payload,
+                    headers=kwargs.get("headers"),
+                ) as resp:
+                    assert resp.status == 200
+                    data = await resp.json(content_type=None)
+                    return data
+            except (
+                aiohttp.ClientError,
+                aiohttp.ClientConnectorError,
+                aiohttp.client_exceptions.ServerDisconnectedError,
+                ConnectionResetError,
+            ) as err:
+                error = err
+            except asyncio.TimeoutError:
+                error = "Connection timed out."
+            except AssertionError:
+                error = "Response status not 200."
+                break
+            except SyntaxError as err:
+                error = "Invalid response"
+                break
+
+            await asyncio.sleep(1)
+        raise ApiError(
+            f"No valid response after {count} failed attempt{['','s'][count>1]}. Last error was: {error}"
+        )

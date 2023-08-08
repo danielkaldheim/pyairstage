@@ -1,11 +1,16 @@
 from .constants import *
-from .api import Api
+
+from .airstageApi import AirstageApi, ApiCloud, ApiLocal
+
+
+class AirstageACError(Exception):
+    """Airstage AC Error"""
 
 
 class AirstageAC:
-    def __init__(self, dsn: str, api: Api) -> None:
+    def __init__(self, dsn: str, api: AirstageApi | ApiCloud | ApiLocal) -> None:
         if not api:
-            raise Exception("Missing api")
+            raise AirstageACError("Missing api")
 
         if not dsn or not isinstance(dsn, str):
             raise ValueError("dsn must be a non-empty string")
@@ -20,7 +25,7 @@ class AirstageAC:
         if not data:
             devices = self._api.get_devices()
             if not isinstance(self.dsn, devices):
-                raise Exception(f"dsn not found {self.dsn}")
+                raise AirstageACError(f"dsn not found {self.dsn}")
             data = devices[self.dsn]
 
         self._cache = data
@@ -36,9 +41,12 @@ class AirstageAC:
                 pass
         return self
 
+    def getCache(self):
+        return self._cache
+
     def _get_cached_device_parameter(self, parameterName: ACParameter) -> any:
         if not isinstance(parameterName, ACParameter):
-            raise Exception(f"Invalid parameter name: {parameterName}")
+            raise AirstageACError(f"Invalid parameter name: {parameterName}")
 
         if parameterName in self._cache:
             return self._cache[parameterName]
@@ -66,7 +74,7 @@ class AirstageAC:
 
     async def set_operation_mode(self, mode: OperationMode):
         if not isinstance(mode, OperationMode):
-            raise Exception(f"Invalid operationMode value: {mode}")
+            raise AirstageACError(f"Invalid operationMode value: {mode}")
         await self._set_device_parameter(ACParameter.OPERATION_MODE, mode)
 
     def get_fan_speed(self):
@@ -76,7 +84,7 @@ class AirstageAC:
 
     async def set_fan_speed(self, fan_speed: FanSpeed):
         if not isinstance(fan_speed, FanSpeed):
-            raise Exception(f"Invalid fan speed value: {fan_speed}")
+            raise AirstageACError(f"Invalid fan speed value: {fan_speed}")
         await self._set_device_parameter(ACParameter.FAN_SPEED, fan_speed)
 
     def get_display_temperature(self) -> float | None:
@@ -92,7 +100,7 @@ class AirstageAC:
 
     async def set_target_temperature(self, target_temperature: float):
         if target_temperature < self._min_temp or target_temperature > self._max_temp:
-            raise Exception(
+            raise AirstageACError(
                 f"Invalid targetTemperature: {target_temperature}. Value must be {self._min_temp} <= target <= {self._max_temp}"
             )
 
@@ -106,7 +114,7 @@ class AirstageAC:
 
     async def set_vertical_direction(self, direction: VerticalSwingPosition):
         if not isinstance(direction, VerticalSwingPosition):
-            raise Exception(f"Invalid fan direction value: {direction}")
+            raise AirstageACError(f"Invalid fan direction value: {direction}")
         await self._set_device_parameter(ACParameter.VERTICAL_DIRECTION, direction)
 
     def get_vertical_swing(self):
@@ -116,12 +124,14 @@ class AirstageAC:
 
     async def set_vertical_swing(self, mode: BooleanProperty):
         if not isinstance(mode, BooleanProperty):
-            raise Exception(f"Invalid mode value: {mode}")
+            raise AirstageACError(f"Invalid mode value: {mode}")
         await self._set_device_parameter(ACParameter.VERTICAL_SWING, mode)
 
     async def _set_device_parameter(self, parameterName: ACParameter, value):
         if not isinstance(parameterName, ACParameter):
-            raise Exception(f"Invalid property name: {parameterName}")
+            raise AirstageACError(f"Invalid property name: {parameterName}")
 
-        await self._api.set_parameter(self._dsn, parameterName, value)
-        self._cache[parameterName] = value
+        updatedValue = await self._api.set_parameter(self._dsn, parameterName, value)
+        if updatedValue is not None:
+            self._cache[parameterName] = value
+            return value
