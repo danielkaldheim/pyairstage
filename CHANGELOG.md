@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/danielkaldheim/pyairstage/compare/v1.0.0...v1.0.1) (2023-08-08)
+
+
+### Bug Fixes
+
+* **ci:** bump version ([1609ab8](https://github.com/danielkaldheim/pyairstage/commit/1609ab82d750528611fe84c078fbd9de091b601b))
+
 # 1.0.0 (2023-08-08)
 
 
