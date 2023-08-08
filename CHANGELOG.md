@@ -1,3 +1,10 @@
+## [1.0.2](https://github.com/danielkaldheim/pyairstage/compare/v1.0.1...v1.0.2) (2023-08-08)
+
+
+### Bug Fixes
+
+* **switches:** added support for controling switches ([5ba824b](https://github.com/danielkaldheim/pyairstage/commit/5ba824bb00f9a5baae4eabfa89a0cc34b8ff3b8c))
+
 ## [1.0.1](https://github.com/danielkaldheim/pyairstage/compare/v1.0.0...v1.0.1) (2023-08-08)
 
 
