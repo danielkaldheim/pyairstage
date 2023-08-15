@@ -118,6 +118,8 @@ VALUE_TO_VERTICAL_POSITION = {
     4: VerticalPositionDescriptors.LOWEST,
 }
 
+CAPABILITY_NOT_AVAILABLE = "65535"
+
 
 class ACParameter(enum.Enum):
     ONOFF_MODE = "iu_onoff"

@@ -7,7 +7,6 @@ import uuid
 import asyncio
 import aiohttp
 
-
 HEADER_CONTENT_TYPE = "Content-Type"
 HEADER_USER_AGENT = "User-Agent"
 HEADER_VALUE_CONTENT_TYPE = "application/json"
@@ -252,38 +251,29 @@ class ApiLocal(AirstageApi):
         self.ip_address = ip_address
 
     async def get_devices(self):
-        # wlanInfo = await self.get_parameters(
-        #     [
-        #         "wla_main_ver",
-        #         "wla_model",
-        #         "iu_dev_cap",
-        #         "iu_op_stat",
-        #         "iu_monitor1",
-        #         "wla_cloud_mode",
-        #         "wla_led",
-        #     ],
-        #     device_sub_id=1,
-        # )
-
-        modelInfo = await self.get_parameters(
-            [
-                "iu_model",
-            ],
-        )
+        modelInfo = {}
+        try:
+            modelInfo = await self.get_parameters(
+                [
+                    "iu_model",
+                ],
+            )
+        except ApiError as err:
+            _LOGGER.debug(err)
 
         acInfo = await self.get_parameters(
             [
-                "iu_wifi_led",
-                "iu_af_inc_hrz",
-                "iu_af_inc_vrt",
+                # "iu_wifi_led",
+                # "iu_af_inc_hrz",
+                # "iu_af_inc_vrt",
                 "iu_indoor_tmp",
                 "iu_outdoor_tmp",
-                "iu_hmn_det",
-                "iu_main_ver",
-                "iu_eep_ver",
-                "iu_has_upd_main",
-                "iu_has_upd_eep",
-                "iu_fld_set80",
+                # "iu_hmn_det",
+                # "iu_main_ver",
+                # "iu_eep_ver",
+                # "iu_has_upd_main",
+                # "iu_has_upd_eep",
+                # "iu_fld_set80",
             ],
         )
 
@@ -319,11 +309,15 @@ class ApiLocal(AirstageApi):
 
         devices = {}
 
+        model = "Airstage"
+        if "iu_model" in parameters:
+            model = parameters["iu_model"]
+
         devices[self.device_id] = {
             "isSubuser": False,
             "deviceId": self.device_id,
             "deviceName": self.device_id,
-            "model": modelInfo["iu_model"],
+            "model": model,
             "parameters": formattedParameters,
         }
 
@@ -343,10 +337,11 @@ class ApiLocal(AirstageApi):
             "list": value,
         }
 
+        _LOGGER.debug(json.dumps(jsonPayload))
+
         response = await self.async_call_api(
             "POST", f"http://{self.ip_address}/GetParam", json=json.dumps(jsonPayload)
         )
-        _LOGGER.debug(json.dumps(jsonPayload))
 
         _LOGGER.debug(response)
 
@@ -365,10 +360,11 @@ class ApiLocal(AirstageApi):
             "value": {str(name): str(value)},
         }
 
+        _LOGGER.debug(json.dumps(jsonPayload))
+
         response = await self.async_call_api(
             "POST", f"http://{self.ip_address}/SetParam", json=json.dumps(jsonPayload)
         )
-        _LOGGER.debug(json.dumps(jsonPayload))
 
         _LOGGER.debug(response)
 
