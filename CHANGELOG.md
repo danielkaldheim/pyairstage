@@ -1,3 +1,10 @@
+## [1.0.4](https://github.com/danielkaldheim/pyairstage/compare/v1.0.3...v1.0.4) (2023-08-16)
+
+
+### Bug Fixes
+
+* **led:** added missing led option ([0837d3b](https://github.com/danielkaldheim/pyairstage/commit/0837d3bcefe441fa8f6f4ccddd9097a456974ddb))
+
 ## [1.0.3](https://github.com/danielkaldheim/pyairstage/compare/v1.0.2...v1.0.3) (2023-08-15)
 
 
