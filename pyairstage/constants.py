@@ -139,6 +139,8 @@ class ACParameter(enum.Enum):
 
     OUTDOOR_LOW_NOISE = "ou_low_noise"
 
+    INDOOR_LED = "iu_wifi_led"
+
     # # below are readonly properties
     # DISPLAY_TEMPERATURE = "display_temperature"
     # # Unclear what this does, seems to somewhat correlate to af_vertical_direction but not entirely

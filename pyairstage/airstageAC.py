@@ -205,3 +205,15 @@ class AirstageAC:
         if not isinstance(mode, BooleanProperty):
             raise AirstageACError(f"Invalid mode value: {mode}")
         await self._set_device_parameter(ACParameter.OUTDOOR_LOW_NOISE, mode)
+
+    def get_indoor_led(self) -> BooleanDescriptors | None:
+        value = self._get_cached_device_parameter(ACParameter.INDOOR_LED)
+        if value == CAPABILITY_NOT_AVAILABLE:
+            return
+
+        return VALUE_TO_BOOLEAN[int(value)]
+
+    async def set_indoor_led(self, mode: BooleanProperty):
+        if not isinstance(mode, BooleanProperty):
+            raise AirstageACError(f"Invalid mode value: {mode}")
+        await self._set_device_parameter(ACParameter.INDOOR_LED, mode)

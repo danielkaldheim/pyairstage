@@ -263,7 +263,7 @@ class ApiLocal(AirstageApi):
 
         acInfo = await self.get_parameters(
             [
-                # "iu_wifi_led",
+                "iu_wifi_led",
                 # "iu_af_inc_hrz",
                 # "iu_af_inc_vrt",
                 "iu_indoor_tmp",
