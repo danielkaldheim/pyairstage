@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/danielkaldheim/pyairstage/compare/v1.0.4...v1.1.0) (2023-08-18)
+
+
+### Features
+
+* **human detection:** added parameter for human detection(?) ([5f30667](https://github.com/danielkaldheim/pyairstage/commit/5f30667736e885e702ca07a82fc8d6afd227a4f1))
+
 ## [1.0.4](https://github.com/danielkaldheim/pyairstage/compare/v1.0.3...v1.0.4) (2023-08-16)
 
 
