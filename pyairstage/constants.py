@@ -137,6 +137,8 @@ class ACParameter(enum.Enum):
     VERTICAL_SWING = "iu_af_swg_vrt"
     VERTICAL_DIRECTION = "iu_af_dir_vrt"
 
+    HUMAN_DETECTION = "iu_hmn_det"
+
     OUTDOOR_LOW_NOISE = "ou_low_noise"
 
     INDOOR_LED = "iu_wifi_led"

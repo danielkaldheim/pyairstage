@@ -102,16 +102,10 @@ class AirstageAC:
         await self._set_device_parameter(ACParameter.FAN_SPEED, fan_speed)
 
     def get_display_temperature(self) -> float | None:
-        return (
-            int(self._get_cached_device_parameter(ACParameter.INDOOR_TEMPERATURE))
-            - 5000
-        ) / 100
+        return self.get_device_parameter(ACParameter.INDOOR_TEMPERATURE)
 
     def get_outdoor_temperature(self) -> float | None:
-        return (
-            int(self._get_cached_device_parameter(ACParameter.OUTDOOR_TEMPERATURE))
-            - 5000
-        ) / 100
+        return self.get_device_parameter(ACParameter.OUTDOOR_TEMPERATURE)
 
     def get_target_temperature(self) -> float | None:
         return (
@@ -217,3 +211,9 @@ class AirstageAC:
         if not isinstance(mode, BooleanProperty):
             raise AirstageACError(f"Invalid mode value: {mode}")
         await self._set_device_parameter(ACParameter.INDOOR_LED, mode)
+
+    def get_human_detection(self) -> BooleanDescriptors | None:
+        value = self._get_cached_device_parameter(ACParameter.HUMAN_DETECTION)
+        if value == CAPABILITY_NOT_AVAILABLE:
+            return
+        return VALUE_TO_BOOLEAN[int(value)]

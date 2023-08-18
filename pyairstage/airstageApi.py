@@ -268,7 +268,7 @@ class ApiLocal(AirstageApi):
                 # "iu_af_inc_vrt",
                 "iu_indoor_tmp",
                 "iu_outdoor_tmp",
-                # "iu_hmn_det",
+                "iu_hmn_det",
                 # "iu_main_ver",
                 # "iu_eep_ver",
                 # "iu_has_upd_main",
