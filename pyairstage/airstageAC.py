@@ -79,7 +79,6 @@ class AirstageAC:
             self._cache[parameterName] = value
             return value
 
-
     def get_device_parameter(self, parameterName: ACParameter) -> Any:
         value = self._cache[parameterName]
         if (
