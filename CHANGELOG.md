@@ -1,3 +1,10 @@
+## [1.1.1](https://github.com/danielkaldheim/pyairstage/compare/v1.1.0...v1.1.1) (2023-10-17)
+
+
+### Bug Fixes
+
+* **target temperature:** get last good value if value returns error ([abf2cb1](https://github.com/danielkaldheim/pyairstage/commit/abf2cb1994ecee56bc12f0fac125acc5c7795288))
+
 # [1.1.0](https://github.com/danielkaldheim/pyairstage/compare/v1.0.4...v1.1.0) (2023-08-18)
 
 
