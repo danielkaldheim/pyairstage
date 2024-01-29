@@ -163,7 +163,8 @@ class AirstageAC:
                 f"Invalid targetTemperature: {target_temperature}. Value must be {min_temp} <= target <= {max_temp}"
             )
 
-        actual_target = int(target_temperature * 10)
+        rounded_temp = round(target_temperature * 2) / 2
+        actual_target = int(rounded_temp * 10)
         await self._set_device_parameter(ACParameter.TARGET_TEMPERATURE, actual_target)
 
     def get_vertical_direction(self) -> VerticalPositionDescriptors | None:
