@@ -143,6 +143,8 @@ class ACParameter(enum.Enum):
 
     INDOOR_LED = "iu_wifi_led"
 
+    MINIMUM_HEAT = "iu_min_heat"
+
     # # below are readonly properties
     # DISPLAY_TEMPERATURE = "display_temperature"
     # # Unclear what this does, seems to somewhat correlate to af_vertical_direction but not entirely
