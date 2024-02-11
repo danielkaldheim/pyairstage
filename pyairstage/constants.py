@@ -136,8 +136,11 @@ class ACParameter(enum.Enum):
     REFRESH_READ_PROPERTIES = "get_prop"
     VERTICAL_SWING = "iu_af_swg_vrt"
     VERTICAL_DIRECTION = "iu_af_dir_vrt"
+    HORIZONTAL_SWING = 'iu_af_dir_hrz'
+    HORIZONTAL_DIRECTION = 'iu_af_swg_hrz'
 
     HMN_DETECTION = "iu_hmn_det"
+    HMN_DETECTION_AUTO_SAVE = 'iu_hmn_det_auto_save'
 
     OUTDOOR_LOW_NOISE = "ou_low_noise"
 
@@ -148,6 +151,11 @@ class ACParameter(enum.Enum):
     # # Unclear what this does, seems to somewhat correlate to af_vertical_direction but not entirely
     # VERTICAL_SWING_POSITION = "af_vertical_num_dir"
     DEVICE_NAME = "deviceName"
+    MODEL = 'iu_model'
+
+    ERROR_CODE = 'iu_err_code'
+    DEMAND = 'iu_demand'
+    SIGN_RESET = 'iu_fltr_sign_reset'
 
     def __str__(self):
         return self._value_
