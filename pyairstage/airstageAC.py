@@ -242,6 +242,17 @@ class AirstageAC:
             raise AirstageACError(f"Invalid mode value: {mode}")
         await self._set_device_parameter(ACParameter.INDOOR_LED, mode)
 
+    def get_minimum_heat(self) -> BooleanDescriptors | None:
+        if self._is_capability_available(ACParameter.MINIMUM_HEAT):
+            value = self._get_cached_device_parameter(ACParameter.MINIMUM_HEAT)
+            return VALUE_TO_BOOLEAN[int(value)]
+        return None
+
+    async def set_minimum_heat(self, mode: BooleanProperty):
+        if not isinstance(mode, BooleanProperty):
+            raise AirstageACError(f"Invalid mode value: {mode}")
+        await self._set_device_parameter(ACParameter.MINIMUM_HEAT, mode)
+
     def get_hmn_detection(self) -> BooleanDescriptors | None:
         if self._is_capability_available(ACParameter.HMN_DETECTION):
             value = self._get_cached_device_parameter(ACParameter.HMN_DETECTION)
