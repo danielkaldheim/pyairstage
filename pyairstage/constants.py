@@ -151,3 +151,13 @@ class ACParameter(enum.Enum):
 
     def __str__(self):
         return self._value_
+
+class ACConstants:
+    AUTO_MIN_TEMP = 18.0
+    AUTO_MAX_TEMP = 30.0
+    COOL_MIN_TEMP = 18.0
+    COOL_MAX_TEMP = 30.0
+    DRY_MIN_TEMP = 18.0
+    DRY_MAX_TEMP = 30.0
+    HEAT_MIN_TEMP = 16.0
+    HEAT_MAX_TEMP = 30.0

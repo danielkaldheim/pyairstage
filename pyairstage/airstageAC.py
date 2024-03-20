@@ -22,8 +22,6 @@ class AirstageAC:
         self._api = api
         self._cache = {}
         self._lastGoodValue = {}
-        self._min_temp = 18.0
-        self._max_temp = 30.0
 
     def refresh_parameters(self, data: dict | None = None):
         if not data:
@@ -80,7 +78,7 @@ class AirstageAC:
             return value
 
     def get_device_parameter(self, parameterName: ACParameter) -> Any:
-        value = self._cache[parameterName]
+        value = self._lastGoodValue[parameterName]
         if (
             parameterName is ACParameter.INDOOR_TEMPERATURE
             or parameterName is ACParameter.OUTDOOR_TEMPERATURE
@@ -142,9 +140,27 @@ class AirstageAC:
         )
 
     async def set_target_temperature(self, target_temperature: float):
-        if target_temperature < self._min_temp or target_temperature > self._max_temp:
+        match self.get_operating_mode():
+            case OperationModeDescriptors.AUTO:
+                min_temp = ACConstants.AUTO_MIN_TEMP
+                max_temp = ACConstants.AUTO_MAX_TEMP
+            case OperationModeDescriptors.COOL:
+                min_temp = ACConstants.COOL_MIN_TEMP
+                max_temp = ACConstants.COOL_MAX_TEMP
+            case OperationModeDescriptors.DRY:
+                min_temp = ACConstants.DRY_MIN_TEMP
+                max_temp = ACConstants.DRY_MAX_TEMP
+            case OperationModeDescriptors.FAN:
+                raise AirstageACError(
+                    f"Invalid targetTemperature: {target_temperature}. targetTemperature cannot be set in FAN mode"
+                )
+            case OperationModeDescriptors.HEAT:
+                min_temp = ACConstants.HEAT_MIN_TEMP
+                max_temp = ACConstants.HEAT_MAX_TEMP
+
+        if target_temperature < min_temp or target_temperature > max_temp:
             raise AirstageACError(
-                f"Invalid targetTemperature: {target_temperature}. Value must be {self._min_temp} <= target <= {self._max_temp}"
+                f"Invalid targetTemperature: {target_temperature}. Value must be {min_temp} <= target <= {max_temp}"
             )
 
         actual_target = int(target_temperature * 10)
