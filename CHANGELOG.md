@@ -1,3 +1,10 @@
+## [1.1.2](https://github.com/danielkaldheim/pyairstage/compare/v1.1.1...v1.1.2) (2024-03-20)
+
+
+### Bug Fixes
+
+* **lint:** fixes lint errors ([3e6416e](https://github.com/danielkaldheim/pyairstage/commit/3e6416eec5ac111642fb294a520298827e76e22a))
+
 ## [1.1.1](https://github.com/danielkaldheim/pyairstage/compare/v1.1.0...v1.1.1) (2023-10-17)
 
 
