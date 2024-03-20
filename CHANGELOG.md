@@ -1,3 +1,10 @@
+## [1.1.3](https://github.com/danielkaldheim/pyairstage/compare/v1.1.2...v1.1.3) (2024-03-20)
+
+
+### Bug Fixes
+
+* set temp correctly when F instead of C ([862cf11](https://github.com/danielkaldheim/pyairstage/commit/862cf11d767f26f7a4be22f452eac0deb5552c9b))
+
 ## [1.1.2](https://github.com/danielkaldheim/pyairstage/compare/v1.1.1...v1.1.2) (2024-03-20)
 
 
