@@ -89,39 +89,36 @@ class BooleanDescriptors(enum.Enum):
 VALUE_TO_BOOLEAN = {0: BooleanDescriptors.OFF, 1: BooleanDescriptors.ON}
 
 
-class VerticalSwingPosition(enum.IntEnum):
+class VerticalSwingPositions(enum.StrEnum):
+    # Note: These strings correspond to HA swing positions
+    HIGHEST = "Highest"
+    HIGH = "High"
+    CENTER_HIGH = "Center High"
+    CENTER_LOW = "Center Low"
+    LOW = "Low"
+    LOWEST = "Lowest"
+
+
+class VerticalSwing4PositionsValues(enum.IntEnum):
     HIGHEST = 1
     HIGH = 2
     LOW = 3
     LOWEST = 4
 
-    def __str__(self):
-        return str(self._value_)
 
+class VerticalSwing6PositionsValues(enum.IntEnum):
+    HIGHEST = 1
+    HIGH = 2
+    CENTER_HIGH = 3
+    CENTER_LOW = 4
+    LOW = 5
+    LOWEST = 6
 
-class VerticalPositionDescriptors(enum.Enum):
-    HIGHEST = "HIGHEST"
-    HIGH = "HIGH"
-    CENTER_HIGH = "CENTER_HIGH"
-    CENTER_LOW = "CENTER_LOW"
-    LOW = "LOW"
-    LOWEST = "LOWEST"
-
-    def __str__(self):
-        return self._value_
-
-
-VALUE_TO_VERTICAL_POSITION = {
-    1: VerticalPositionDescriptors.HIGHEST,
-    2: VerticalPositionDescriptors.HIGH,
-    3: VerticalPositionDescriptors.LOW,
-    4: VerticalPositionDescriptors.LOWEST,
-}
 
 CAPABILITY_NOT_AVAILABLE = "65535"
 
 
-class ACParameter(enum.Enum):
+class ACParameter(enum.StrEnum):
     ONOFF_MODE = "iu_onoff"
     OPERATION_MODE = "iu_op_mode"
     FAN_SPEED = "iu_fan_spd"
@@ -135,6 +132,7 @@ class ACParameter(enum.Enum):
 
     REFRESH_READ_PROPERTIES = "get_prop"
     VERTICAL_SWING = "iu_af_swg_vrt"
+    VERTICAL_SWING_POSITIONS = "iu_af_inc_vrt"
     VERTICAL_DIRECTION = "iu_af_dir_vrt"
     HORIZONTAL_SWING = "iu_af_dir_hrz"
     HORIZONTAL_DIRECTION = "iu_af_swg_hrz"

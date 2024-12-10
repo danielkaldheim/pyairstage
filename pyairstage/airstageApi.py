@@ -6,6 +6,7 @@ from typing import Any, Coroutine
 import uuid
 import asyncio
 import aiohttp
+from .constants import ACParameter
 
 HEADER_CONTENT_TYPE = "Content-Type"
 HEADER_USER_AGENT = "User-Agent"
@@ -255,7 +256,7 @@ class ApiLocal(AirstageApi):
         try:
             modelInfo = await self.get_parameters(
                 [
-                    "iu_model",
+                    ACParameter.MODEL,
                 ],
             )
         except ApiError as err:
@@ -263,12 +264,12 @@ class ApiLocal(AirstageApi):
 
         acInfo = await self.get_parameters(
             [
-                "iu_wifi_led",
+                ACParameter.INDOOR_LED,
                 # "iu_af_inc_hrz",
                 # "iu_af_inc_vrt",
-                "iu_indoor_tmp",
-                "iu_outdoor_tmp",
-                "iu_hmn_det",
+                ACParameter.INDOOR_TEMPERATURE,
+                ACParameter.OUTDOOR_TEMPERATURE,
+                ACParameter.HMN_DETECTION,
                 # "iu_main_ver",
                 # "iu_eep_ver",
                 # "iu_has_upd_main",
@@ -279,23 +280,24 @@ class ApiLocal(AirstageApi):
 
         modeInfo = await self.get_parameters(
             [
-                "iu_onoff",
-                "iu_op_mode",
-                "iu_fan_spd",
-                "iu_set_tmp",
-                "iu_af_dir_vrt",
-                "iu_af_swg_vrt",
-                "iu_af_dir_hrz",
-                "iu_af_swg_hrz",
-                "ou_low_noise",
-                "iu_fan_ctrl",
-                "iu_hmn_det_auto_save",
-                "iu_min_heat",
-                "iu_powerful",
-                "iu_economy",
-                "iu_err_code",
-                "iu_demand",
-                "iu_fltr_sign_reset",
+                ACParameter.ONOFF_MODE,
+                ACParameter.OPERATION_MODE,
+                ACParameter.FAN_SPEED,
+                ACParameter.TARGET_TEMPERATURE,
+                ACParameter.VERTICAL_SWING_POSITIONS,
+                ACParameter.VERTICAL_DIRECTION,
+                ACParameter.VERTICAL_SWING,
+                ACParameter.HORIZONTAL_DIRECTION,
+                ACParameter.HORIZONTAL_SWING,
+                ACParameter.OUTDOOR_LOW_NOISE,
+                ACParameter.ENERGY_SAVE_FAN,
+                ACParameter.HMN_DETECTION_AUTO_SAVE,
+                ACParameter.MINIMUM_HEAT,
+                ACParameter.POWERFUL_MODE,
+                ACParameter.ECONOMY_MODE,
+                ACParameter.ERROR_CODE,
+                ACParameter.DEMAND,
+                ACParameter.SIGN_RESET,
             ],
         )
 
@@ -310,8 +312,8 @@ class ApiLocal(AirstageApi):
         devices = {}
 
         model = "Airstage"
-        if "iu_model" in parameters:
-            model = parameters["iu_model"]
+        if ACParameter.MODEL in parameters:
+            model = parameters[ACParameter.MODEL]
 
         devices[self.device_id] = {
             "isSubuser": False,

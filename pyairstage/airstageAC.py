@@ -26,9 +26,9 @@ class AirstageAC:
     def refresh_parameters(self, data: dict | None = None):
         if not data:
             devices = self._api.get_devices()
-            if not isinstance(self.dsn, devices):
-                raise AirstageACError(f"dsn not found {self.dsn}")
-            data = devices[self.dsn]
+            if not isinstance(self._dsn, devices):
+                raise AirstageACError(f"dsn not found {self._dsn}")
+            data = devices[self._dsn]
 
         self._cache = data
 
@@ -167,16 +167,40 @@ class AirstageAC:
         actual_target = int(rounded_temp * 10)
         await self._set_device_parameter(ACParameter.TARGET_TEMPERATURE, actual_target)
 
-    def get_vertical_direction(self) -> VerticalPositionDescriptors | None:
+    def get_vertical_direction(self) -> VerticalSwingPositions | None:
         if self._is_capability_available(ACParameter.VERTICAL_DIRECTION):
             value = self._get_cached_device_parameter(ACParameter.VERTICAL_DIRECTION)
-            return VALUE_TO_VERTICAL_POSITION[int(value)]
+            total_positions = self.get_num_vertical_swing_positions()
+            if total_positions == 6:
+                return VerticalSwingPositions[
+                    VerticalSwing6PositionsValues(int(value)).name
+                ]
+            else:
+                return VerticalSwingPositions[
+                    VerticalSwing4PositionsValues(int(value)).name
+                ]
         return None
 
-    async def set_vertical_direction(self, direction: VerticalSwingPosition):
-        if not isinstance(direction, VerticalSwingPosition):
-            raise AirstageACError(f"Invalid fan direction value: {direction}")
-        await self._set_device_parameter(ACParameter.VERTICAL_DIRECTION, direction)
+    async def set_vertical_direction(self, direction: VerticalSwingPositions):
+        if not isinstance(direction, VerticalSwingPositions):
+            raise AirstageACError(
+                f"Invalid fan direction value: {type(direction)}: {direction}"
+            )
+        total_positions = self.get_num_vertical_swing_positions()
+        if total_positions == 6:
+            direction_value = VerticalSwing6PositionsValues[direction.name]
+        else:
+            direction_value = VerticalSwing4PositionsValues[direction.name]
+
+        await self._set_device_parameter(
+            ACParameter.VERTICAL_DIRECTION, direction_value
+        )
+
+    def get_num_vertical_swing_positions(self) -> int:
+        """We have observed this being 4 or 6"""
+        return int(
+            self._get_cached_device_parameter(ACParameter.VERTICAL_SWING_POSITIONS)
+        )
 
     def get_vertical_swing(self) -> BooleanDescriptors | None:
         if self._is_capability_available(ACParameter.VERTICAL_SWING):
