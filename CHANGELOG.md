@@ -1,3 +1,10 @@
+## [2.0.1](https://github.com/danielkaldheim/pyairstage/compare/v2.0.0...v2.0.1) (2025-04-13)
+
+
+### Bug Fixes
+
+* **dependencies:** paring down requirements to direct needs, removing transitive dependencies as requirements ([baca54d](https://github.com/danielkaldheim/pyairstage/commit/baca54d76dffebaa9e848c83e54b331abc76db38))
+
 # [2.0.0](https://github.com/danielkaldheim/pyairstage/compare/v1.1.3...v2.0.0) (2025-04-13)
 
 
