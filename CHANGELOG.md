@@ -1,3 +1,13 @@
+# [2.0.0](https://github.com/danielkaldheim/pyairstage/compare/v1.1.3...v2.0.0) (2025-04-13)
+
+
+* feat(swing) Reworking vertical swing for 4 or 6 position devices via enum reworking ([35d9a7b](https://github.com/danielkaldheim/pyairstage/commit/35d9a7b35c594ecc3723bdbd21116a743639cca9))
+
+
+### BREAKING CHANGES
+
+* get_vertical_direction and set_vertical_direction have had signature changes; VerticalSwingPosition, VerticalPositionDescriptors, and VALUE_TO_VERTICAL_POSITION have been replaced with VerticalSwingPositions, VerticalSwing4PositionsValues, and VerticalSwing6PositionsValues.
+
 ## [1.1.3](https://github.com/danielkaldheim/pyairstage/compare/v1.1.2...v1.1.3) (2024-03-20)
 
 
