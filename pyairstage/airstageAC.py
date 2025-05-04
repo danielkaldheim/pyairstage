@@ -139,24 +139,40 @@ class AirstageAC:
             int(self._get_cached_device_parameter(ACParameter.TARGET_TEMPERATURE)) / 10
         )
 
-    async def set_target_temperature(self, target_temperature: float):
+    def get_minimum_temperature(self) -> float | None:
         match self.get_operating_mode():
             case OperationModeDescriptors.AUTO:
-                min_temp = ACConstants.AUTO_MIN_TEMP
-                max_temp = ACConstants.AUTO_MAX_TEMP
+                return ACConstants.AUTO_MIN_TEMP
             case OperationModeDescriptors.COOL:
-                min_temp = ACConstants.COOL_MIN_TEMP
-                max_temp = ACConstants.COOL_MAX_TEMP
+                return ACConstants.COOL_MIN_TEMP
             case OperationModeDescriptors.DRY:
-                min_temp = ACConstants.DRY_MIN_TEMP
-                max_temp = ACConstants.DRY_MAX_TEMP
-            case OperationModeDescriptors.FAN:
-                raise AirstageACError(
-                    f"Invalid targetTemperature: {target_temperature}. targetTemperature cannot be set in FAN mode"
-                )
+                return ACConstants.DRY_MIN_TEMP
             case OperationModeDescriptors.HEAT:
-                min_temp = ACConstants.HEAT_MIN_TEMP
-                max_temp = ACConstants.HEAT_MAX_TEMP
+                return ACConstants.HEAT_MIN_TEMP
+            case OperationModeDescriptors.FAN:
+                return None
+
+    def get_maximum_temperature(self) -> float | None:
+        match self.get_operating_mode():
+            case OperationModeDescriptors.AUTO:
+                return ACConstants.AUTO_MAX_TEMP
+            case OperationModeDescriptors.COOL:
+                return ACConstants.COOL_MAX_TEMP
+            case OperationModeDescriptors.DRY:
+                return ACConstants.DRY_MAX_TEMP
+            case OperationModeDescriptors.HEAT:
+                return ACConstants.HEAT_MAX_TEMP
+            case OperationModeDescriptors.FAN:
+                return None
+
+    async def set_target_temperature(self, target_temperature: float):
+        # TODO: excise validation logic, get_minimum_temperature/get_maximum_temperature can be used to pre-validate
+        min_temp = self.get_minimum_temperature()
+        max_temp = self.get_maximum_temperature()
+        if min_temp is None or max_temp is None:
+            raise AirstageACError(
+                f"Invalid targetTemperature: {target_temperature}. targetTemperature cannot be set in FAN mode"
+            )
 
         if target_temperature < min_temp or target_temperature > max_temp:
             raise AirstageACError(
