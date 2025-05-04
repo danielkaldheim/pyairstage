@@ -1,3 +1,10 @@
+# [2.1.0](https://github.com/danielkaldheim/pyairstage/compare/v2.0.1...v2.1.0) (2025-05-04)
+
+
+### Features
+
+* **temperature:** Adding in getters for minimum & maximum temperature ([2f9a4da](https://github.com/danielkaldheim/pyairstage/commit/2f9a4dadd497351d2ed193a5acdbc6cf817dec6c))
+
 ## [2.0.1](https://github.com/danielkaldheim/pyairstage/compare/v2.0.0...v2.0.1) (2025-04-13)
 
 
