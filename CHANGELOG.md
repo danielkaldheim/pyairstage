@@ -1,3 +1,10 @@
+# [2.2.0](https://github.com/danielkaldheim/pyairstage/compare/v2.1.0...v2.2.0) (2025-07-28)
+
+
+### Features
+
+* **power:** start pulling power consumption value ([8b7295a](https://github.com/danielkaldheim/pyairstage/commit/8b7295a78b21c89f4abee8a7ee0fd7b5aa0e10c0))
+
 # [2.1.0](https://github.com/danielkaldheim/pyairstage/compare/v2.0.1...v2.1.0) (2025-05-04)
 
 
