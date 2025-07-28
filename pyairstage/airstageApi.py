@@ -275,6 +275,7 @@ class ApiLocal(AirstageApi):
                 # "iu_has_upd_main",
                 # "iu_has_upd_eep",
                 # "iu_fld_set80",
+                ACParameter.POWER_CONSUMPTION,
             ],
         )
 

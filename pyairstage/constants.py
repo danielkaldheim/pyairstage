@@ -130,6 +130,8 @@ class ACParameter(enum.StrEnum):
     INDOOR_TEMPERATURE = "iu_indoor_tmp"
     OUTDOOR_TEMPERATURE = "iu_outdoor_tmp"
 
+    POWER_CONSUMPTION = "iu_pow_cons"
+
     REFRESH_READ_PROPERTIES = "get_prop"
     VERTICAL_SWING = "iu_af_swg_vrt"
     VERTICAL_SWING_POSITIONS = "iu_af_inc_vrt"
