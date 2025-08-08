@@ -53,7 +53,9 @@ class FanSpeed(enum.IntEnum):
 class FanSpeedDescriptors(enum.Enum):
     QUIET = "QUIET"
     LOW = "LOW"
+    MEDIUM_LOW = "MEDIUM_LOW"
     MEDIUM = "MEDIUM"
+    MEDIUM_HIGH = "MEDIUM_HIGH"
     HIGH = "HIGH"
     AUTO = "AUTO"
 
@@ -65,7 +67,9 @@ VALUE_TO_FAN_SPEED = {
     0: FanSpeedDescriptors.AUTO,
     2: FanSpeedDescriptors.QUIET,
     5: FanSpeedDescriptors.LOW,
+    7: FanSpeedDescriptors.MEDIUM_LOW,
     8: FanSpeedDescriptors.MEDIUM,
+    9: FanSpeedDescriptors.MEDIUM_HIGH,
     11: FanSpeedDescriptors.HIGH,
 }
 
