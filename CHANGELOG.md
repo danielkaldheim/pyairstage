@@ -1,3 +1,10 @@
+# [2.3.0](https://github.com/danielkaldheim/pyairstage/compare/v2.2.0...v2.3.0) (2025-08-08)
+
+
+### Features
+
+* **fan speed:** adding cases for fans with medium-low and medium-high ([d89abe4](https://github.com/danielkaldheim/pyairstage/commit/d89abe48042ef7075b2c0b181da0883578eeb7a6))
+
 # [2.2.0](https://github.com/danielkaldheim/pyairstage/compare/v2.1.0...v2.2.0) (2025-07-28)
 
 
