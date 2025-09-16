@@ -299,3 +299,20 @@ class AirstageAC:
             value = self._get_cached_device_parameter(ACParameter.HMN_DETECTION)
             return VALUE_TO_BOOLEAN[int(value)]
         return None
+
+    def get_hmn_detection(self) -> BooleanDescriptors | None:
+        if self._is_capability_available(ACParameter.HMN_DETECTION):
+            value = self._get_cached_device_parameter(ACParameter.HMN_DETECTION)
+            return VALUE_TO_BOOLEAN[int(value)]
+        return None
+
+    def get_hmn_detection_auto_save(self) -> BooleanDescriptors | None:
+        if self._is_capability_available(ACParameter.HMN_DETECTION_AUTO_SAVE):
+            value = self._get_cached_device_parameter(ACParameter.HMN_DETECTION_AUTO_SAVE)
+            return VALUE_TO_BOOLEAN[int(value)]
+        return None
+
+    async def set_hmn_detection_auto_save(self, mode: BooleanProperty):
+        if not isinstance(mode, BooleanProperty):
+            raise AirstageACError(f"Invalid mode value: {mode}")
+        await self._set_device_parameter(ACParameter.HMN_DETECTION_AUTO_SAVE, mode)
