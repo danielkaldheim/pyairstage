@@ -1,3 +1,10 @@
+# [2.4.0](https://github.com/danielkaldheim/pyairstage/compare/v2.3.0...v2.4.0) (2025-09-16)
+
+
+### Features
+
+* **hmn detection:** added getter/setter for hmn_detection_auto_save ([4a7947f](https://github.com/danielkaldheim/pyairstage/commit/4a7947f9056c29b41f141dd6dfb52b007ecc77a5))
+
 # [2.3.0](https://github.com/danielkaldheim/pyairstage/compare/v2.2.0...v2.3.0) (2025-08-08)
 
 
