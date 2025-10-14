@@ -203,10 +203,16 @@ class AirstageAC:
                 f"Invalid fan direction value: {type(direction)}: {direction}"
             )
         total_positions = self.get_num_vertical_swing_positions()
-        if total_positions == 6:
+        if total_positions == 8:
             direction_value = VerticalSwing6PositionsValues[direction.name]
-        else:
+        elif total_positions == 6:
+            direction_value = VerticalSwing6PositionsValues[direction.name]
+        elif total_positions == 4:
             direction_value = VerticalSwing4PositionsValues[direction.name]
+        else:
+            raise AirstageACError(
+                f"Invalid total_positions value: {total_positions}. Only 4, 6 and 8 are supported"
+            )
 
         await self._set_device_parameter(
             ACParameter.VERTICAL_DIRECTION, direction_value
