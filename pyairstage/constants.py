@@ -120,6 +120,7 @@ class VerticalSwing6PositionsValues(enum.IntEnum):
     LOW = 5
     LOWEST = 6
 
+
 class VerticalSwing8PositionsValues(enum.IntEnum):
     HIGHEST = 1
     HIGHER = 2
@@ -129,6 +130,7 @@ class VerticalSwing8PositionsValues(enum.IntEnum):
     LOW = 6
     LOWER = 7
     LOWEST = 8
+
 
 CAPABILITY_NOT_AVAILABLE = "65535"
 
