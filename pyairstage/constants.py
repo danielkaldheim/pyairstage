@@ -96,10 +96,12 @@ VALUE_TO_BOOLEAN = {0: BooleanDescriptors.OFF, 1: BooleanDescriptors.ON}
 class VerticalSwingPositions(enum.StrEnum):
     # Note: These strings correspond to HA swing positions
     HIGHEST = "Highest"
+    HIGHER = "Higher"
     HIGH = "High"
     CENTER_HIGH = "Center High"
     CENTER_LOW = "Center Low"
     LOW = "Low"
+    LOWER = "Lower"
     LOWEST = "Lowest"
 
 
@@ -117,6 +119,17 @@ class VerticalSwing6PositionsValues(enum.IntEnum):
     CENTER_LOW = 4
     LOW = 5
     LOWEST = 6
+
+
+class VerticalSwing8PositionsValues(enum.IntEnum):
+    HIGHEST = 1
+    HIGHER = 2
+    HIGH = 3
+    CENTER_HIGH = 4
+    CENTER_LOW = 5
+    LOW = 6
+    LOWER = 7
+    LOWEST = 8
 
 
 CAPABILITY_NOT_AVAILABLE = "65535"
