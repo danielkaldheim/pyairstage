@@ -11,12 +11,11 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/danielkaldheim/pyairstage",
-    license="MIT License",
+    license="MIT",
     packages=["pyairstage"],
     install_requires=["aiohttp"],
     classifiers=[
         "Programming Language :: Python :: 3",
-        "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
 )
