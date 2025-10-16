@@ -1,3 +1,10 @@
+## [2.4.1](https://github.com/danielkaldheim/pyairstage/compare/v2.4.0...v2.4.1) (2025-10-16)
+
+
+### Bug Fixes
+
+* **release:** Attempting to kick semantic-release ([d5338da](https://github.com/danielkaldheim/pyairstage/commit/d5338da260e93ee5b082e789a8766200e4729e39))
+
 # [2.4.0](https://github.com/danielkaldheim/pyairstage/compare/v2.3.0...v2.4.0) (2025-10-16)
 
 
