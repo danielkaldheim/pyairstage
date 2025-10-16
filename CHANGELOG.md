@@ -1,3 +1,11 @@
+# [2.4.0](https://github.com/danielkaldheim/pyairstage/compare/v2.3.0...v2.4.0) (2025-10-16)
+
+
+### Features
+
+* **hmn detection:** added getter/setter for hmn_detection_auto_save ([4a7947f](https://github.com/danielkaldheim/pyairstage/commit/4a7947f9056c29b41f141dd6dfb52b007ecc77a5))
+* **vertical swing:** add support for 8-position vertical swing ([#11](https://github.com/danielkaldheim/pyairstage/issues/11)) ([542b968](https://github.com/danielkaldheim/pyairstage/commit/542b96893940a5eba4f6eb31745c2b9bfa3fe27a))
+
 # [2.3.0](https://github.com/danielkaldheim/pyairstage/compare/v2.2.0...v2.3.0) (2025-08-08)
 
 
