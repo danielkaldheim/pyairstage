@@ -6,6 +6,7 @@ from typing import Any, Coroutine
 import uuid
 import asyncio
 import aiohttp
+import requests
 from .constants import ACParameter
 
 HEADER_CONTENT_TYPE = "Content-Type"
@@ -397,11 +398,11 @@ class ApiLocal(AirstageApi):
                 async with self.session.request(
                     method,
                     url,
-                    timeout=aiohttp.ClientTimeout(total=4),
+                    timeout=aiohttp.ClientTimeout(total=10),
                     data=payload,
                     headers=kwargs.get("headers"),
                 ) as resp:
-                    assert resp.status == 200
+                    resp.raise_for_status()
                     data = await resp.json(content_type=None)
                     return data
             except (
@@ -409,13 +410,11 @@ class ApiLocal(AirstageApi):
                 aiohttp.ClientConnectorError,
                 aiohttp.client_exceptions.ServerDisconnectedError,
                 ConnectionResetError,
+                requests.exceptions.HTTPError,
             ) as err:
                 error = err
             except asyncio.TimeoutError:
                 error = "Connection timed out."
-            except AssertionError:
-                error = "Response status not 200."
-                break
             except SyntaxError as err:
                 error = "Invalid response"
                 break

@@ -83,7 +83,7 @@ class AirstageAC:
             parameterName is ACParameter.INDOOR_TEMPERATURE
             or parameterName is ACParameter.OUTDOOR_TEMPERATURE
         ):
-            value = (int(value) - 5000) / 100
+            value = (int(value) - 5000) / 100 if value is not None else None
         return value
 
     def get_device_name(self) -> str:
@@ -235,7 +235,7 @@ class AirstageAC:
     def get_vertical_swing(self) -> BooleanDescriptors | None:
         if self._is_capability_available(ACParameter.VERTICAL_SWING):
             value = self._get_cached_device_parameter(ACParameter.VERTICAL_SWING)
-            return VALUE_TO_BOOLEAN[int(value)]
+            return VALUE_TO_BOOLEAN[int(value)] if value is not None else None
         return None
 
     async def set_vertical_swing(self, mode: BooleanProperty):
@@ -246,7 +246,7 @@ class AirstageAC:
     def get_economy_mode(self) -> BooleanDescriptors | None:
         if self._is_capability_available(ACParameter.ECONOMY_MODE):
             value = self._get_cached_device_parameter(ACParameter.ECONOMY_MODE)
-            return VALUE_TO_BOOLEAN[int(value)]
+            return VALUE_TO_BOOLEAN[int(value)] if value is not None else None
         return None
 
     async def set_economy_mode(self, mode: BooleanProperty):
@@ -267,7 +267,7 @@ class AirstageAC:
     def get_powerful_mode(self) -> BooleanDescriptors | None:
         if self._is_capability_available(ACParameter.POWERFUL_MODE):
             value = self._get_cached_device_parameter(ACParameter.POWERFUL_MODE)
-            return VALUE_TO_BOOLEAN[int(value)]
+            return VALUE_TO_BOOLEAN[int(value)] if value is not None else None
         return None
 
     async def set_powerful_mode(self, mode: BooleanProperty):
@@ -278,7 +278,7 @@ class AirstageAC:
     def get_outdoor_low_noise(self) -> BooleanDescriptors | None:
         if self._is_capability_available(ACParameter.OUTDOOR_LOW_NOISE):
             value = self._get_cached_device_parameter(ACParameter.OUTDOOR_LOW_NOISE)
-            return VALUE_TO_BOOLEAN[int(value)]
+            return VALUE_TO_BOOLEAN[int(value)] if value is not None else None
         return None
 
     async def set_outdoor_low_noise(self, mode: BooleanProperty):
@@ -289,7 +289,7 @@ class AirstageAC:
     def get_indoor_led(self) -> BooleanDescriptors | None:
         if self._is_capability_available(ACParameter.INDOOR_LED):
             value = self._get_cached_device_parameter(ACParameter.INDOOR_LED)
-            return VALUE_TO_BOOLEAN[int(value)]
+            return VALUE_TO_BOOLEAN[int(value)] if value is not None else None
         return None
 
     async def set_indoor_led(self, mode: BooleanProperty):
@@ -300,7 +300,7 @@ class AirstageAC:
     def get_minimum_heat(self) -> BooleanDescriptors | None:
         if self._is_capability_available(ACParameter.MINIMUM_HEAT):
             value = self._get_cached_device_parameter(ACParameter.MINIMUM_HEAT)
-            return VALUE_TO_BOOLEAN[int(value)]
+            return VALUE_TO_BOOLEAN[int(value)] if value is not None else None
         return None
 
     async def set_minimum_heat(self, mode: BooleanProperty):
@@ -311,13 +311,13 @@ class AirstageAC:
     def get_hmn_detection(self) -> BooleanDescriptors | None:
         if self._is_capability_available(ACParameter.HMN_DETECTION):
             value = self._get_cached_device_parameter(ACParameter.HMN_DETECTION)
-            return VALUE_TO_BOOLEAN[int(value)]
+            return VALUE_TO_BOOLEAN[int(value)] if value is not None else None
         return None
 
     def get_hmn_detection(self) -> BooleanDescriptors | None:
         if self._is_capability_available(ACParameter.HMN_DETECTION):
             value = self._get_cached_device_parameter(ACParameter.HMN_DETECTION)
-            return VALUE_TO_BOOLEAN[int(value)]
+            return VALUE_TO_BOOLEAN[int(value)] if value is not None else None
         return None
 
     def get_hmn_detection_auto_save(self) -> BooleanDescriptors | None:
@@ -325,7 +325,7 @@ class AirstageAC:
             value = self._get_cached_device_parameter(
                 ACParameter.HMN_DETECTION_AUTO_SAVE
             )
-            return VALUE_TO_BOOLEAN[int(value)]
+            return VALUE_TO_BOOLEAN[int(value)] if value is not None else None
         return None
 
     async def set_hmn_detection_auto_save(self, mode: BooleanProperty):
