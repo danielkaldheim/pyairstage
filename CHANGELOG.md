@@ -1,3 +1,10 @@
+## [2.4.2](https://github.com/danielkaldheim/pyairstage/compare/v2.4.1...v2.4.2) (2025-11-10)
+
+
+### Bug Fixes
+
+* **connection:** Upping connection timeout + do not try to convert None to int + Adjusting exception handling to improve connection failure message ([d65312d](https://github.com/danielkaldheim/pyairstage/commit/d65312d84c188b7753efef1fb07e984ecd19bfb3))
+
 ## [2.4.1](https://github.com/danielkaldheim/pyairstage/compare/v2.4.0...v2.4.1) (2025-10-16)
 
 
