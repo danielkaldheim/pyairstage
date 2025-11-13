@@ -407,19 +407,23 @@ class ApiLocal(AirstageApi):
                     return data
             except (
                 aiohttp.ClientError,
+                aiohttp.ClientResponseError,
                 aiohttp.ClientConnectorError,
                 aiohttp.client_exceptions.ServerDisconnectedError,
                 ConnectionResetError,
                 requests.exceptions.HTTPError,
+                asyncio.TimeoutError,
+                SyntaxError,
             ) as err:
+                if error is not None and not isinstance(err, type(error)):
+                    # If error changes, log the old one so we don't lose it
+                    _LOGGER.debug(error)
                 error = err
-            except asyncio.TimeoutError:
-                error = "Connection timed out."
-            except SyntaxError as err:
-                error = "Invalid response"
-                break
+                if isinstance(err, SyntaxError):
+                    # Don't retry syntax issues
+                    break
 
             await asyncio.sleep(1)
         raise ApiError(
-            f"No valid response after {count} failed attempt{['','s'][count>1]}. Last error was: {error}"
-        )
+            f"No valid response after {count} failed attempt{['','s'][count>1]}"
+        ) from error
