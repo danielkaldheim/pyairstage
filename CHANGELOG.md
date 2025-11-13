@@ -1,3 +1,10 @@
+## [2.4.3](https://github.com/danielkaldheim/pyairstage/compare/v2.4.2...v2.4.3) (2025-11-13)
+
+
+### Bug Fixes
+
+* **error handling:** fixing error attribution ([129e84b](https://github.com/danielkaldheim/pyairstage/commit/129e84be022bc8775441d13d09b800c7fad14795))
+
 ## [2.4.2](https://github.com/danielkaldheim/pyairstage/compare/v2.4.1...v2.4.2) (2025-11-10)
 
 
