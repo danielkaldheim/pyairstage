@@ -6,7 +6,6 @@ from typing import Any, Coroutine
 import uuid
 import asyncio
 import aiohttp
-import requests
 from .constants import ACParameter
 
 HEADER_CONTENT_TYPE = "Content-Type"
@@ -253,33 +252,20 @@ class ApiLocal(AirstageApi):
         self.ip_address = ip_address
 
     async def get_devices(self):
-        modelInfo = {}
-        try:
-            modelInfo = await self.get_parameters(
-                [
-                    ACParameter.MODEL,
-                ],
-            )
-        except ApiError as err:
-            _LOGGER.debug(err)
-
         acInfo = await self.get_parameters(
             [
+                ACParameter.MODEL,
                 ACParameter.INDOOR_LED,
-                # "iu_af_inc_hrz",
-                # "iu_af_inc_vrt",
                 ACParameter.INDOOR_TEMPERATURE,
                 ACParameter.OUTDOOR_TEMPERATURE,
                 ACParameter.HMN_DETECTION,
-                # "iu_main_ver",
-                # "iu_eep_ver",
-                # "iu_has_upd_main",
-                # "iu_has_upd_eep",
-                # "iu_fld_set80",
                 ACParameter.POWER_CONSUMPTION,
             ],
         )
 
+        # We cannot request more than 20 parameters at once and doing 2 back to back requests results in a disconnected error on the first attempt
+        # A lite pause fixes that though
+        await asyncio.sleep(1)
         modeInfo = await self.get_parameters(
             [
                 ACParameter.ONOFF_MODE,
@@ -303,7 +289,7 @@ class ApiLocal(AirstageApi):
             ],
         )
 
-        parameters = modelInfo | acInfo | modeInfo
+        parameters = acInfo | modeInfo
 
         formattedParameters = []
         for key in parameters:
@@ -405,25 +391,9 @@ class ApiLocal(AirstageApi):
                     resp.raise_for_status()
                     data = await resp.json(content_type=None)
                     return data
-            except (
-                aiohttp.ClientError,
-                aiohttp.ClientResponseError,
-                aiohttp.ClientConnectorError,
-                aiohttp.client_exceptions.ServerDisconnectedError,
-                ConnectionResetError,
-                requests.exceptions.HTTPError,
-                asyncio.TimeoutError,
-                SyntaxError,
-            ) as err:
-                if error is not None and not isinstance(err, type(error)):
-                    # If error changes, log the old one so we don't lose it
-                    _LOGGER.debug(error)
+            except SyntaxError as err:
+                raise ApiError("No valid response") from err
+            except aiohttp.client_exceptions.ServerDisconnectedError as err:
+                await asyncio.sleep(1)
                 error = err
-                if isinstance(err, SyntaxError):
-                    # Don't retry syntax issues
-                    break
-
-            await asyncio.sleep(1)
-        raise ApiError(
-            f"No valid response after {count} failed attempt{['','s'][count>1]}"
-        ) from error
+        raise error
