@@ -258,7 +258,6 @@ class ApiLocal(AirstageApi):
                 ACParameter.INDOOR_LED,
                 ACParameter.INDOOR_TEMPERATURE,
                 ACParameter.OUTDOOR_TEMPERATURE,
-                ACParameter.HMN_DETECTION,
                 ACParameter.POWER_CONSUMPTION,
             ],
         )
@@ -268,6 +267,7 @@ class ApiLocal(AirstageApi):
         await asyncio.sleep(1)
         modeInfo = await self.get_parameters(
             [
+                ACParameter.HMN_DETECTION,
                 ACParameter.ONOFF_MODE,
                 ACParameter.OPERATION_MODE,
                 ACParameter.FAN_SPEED,
