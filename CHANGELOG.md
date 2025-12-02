@@ -1,3 +1,15 @@
+# [3.0.0](https://github.com/danielkaldheim/pyairstage/compare/v2.4.3...v3.0.0) (2025-12-02)
+
+
+### Features
+
+* **reworking retries:** Remove built in retries (except for disconnects), let HA/upstream libraries handle all of that ([37c9731](https://github.com/danielkaldheim/pyairstage/commit/37c9731778742e4e06e822c7c6961773bc8454e7))
+
+
+### BREAKING CHANGES
+
+* **reworking retries:** The exceptions stemming from the api are changing, increasing the range of possibilities
+
 ## [2.4.3](https://github.com/danielkaldheim/pyairstage/compare/v2.4.2...v2.4.3) (2025-11-13)
 
 
