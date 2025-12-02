@@ -1,3 +1,10 @@
+## [3.0.1](https://github.com/danielkaldheim/pyairstage/compare/v3.0.0...v3.0.1) (2025-12-02)
+
+
+### Bug Fixes
+
+* **pow_cons:** iu_pow_cons does not return on api requests that include iu_hmn_det, so bumping to the second request ([e14e8d6](https://github.com/danielkaldheim/pyairstage/commit/e14e8d673105a90caa14f0b20e801d3218473eb2))
+
 # [3.0.0](https://github.com/danielkaldheim/pyairstage/compare/v2.4.3...v3.0.0) (2025-12-02)
 
 
