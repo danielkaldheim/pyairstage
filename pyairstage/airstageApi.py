@@ -242,12 +242,14 @@ class ApiLocal(AirstageApi):
         retry: int = 5,
         device_id: str | None = None,
         ip_address: str | None = None,
+        timeout_seconds: int = 10,
     ) -> None:
         if session is None:
             session = aiohttp.ClientSession()
 
         self.session = session
         self.retry = retry
+        self.timeout_seconds = timeout_seconds
         self.device_id = device_id
         self.ip_address = ip_address
 
@@ -364,10 +366,12 @@ class ApiLocal(AirstageApi):
         self,
         method: str,
         url: str,
-        retry: int = None,
+        retry: int | None = None,
+        timeout_seconds: int | None = None,
         **kwargs,
     ):
         retry = retry or self.retry
+        timeout_seconds = timeout_seconds or self.timeout_seconds
         data = {}
         count = 0
         error = None
@@ -384,7 +388,7 @@ class ApiLocal(AirstageApi):
                 async with self.session.request(
                     method,
                     url,
-                    timeout=aiohttp.ClientTimeout(total=10),
+                    timeout=aiohttp.ClientTimeout(total=timeout_seconds),
                     data=payload,
                     headers=kwargs.get("headers"),
                 ) as resp:
