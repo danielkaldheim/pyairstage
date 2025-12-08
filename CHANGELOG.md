@@ -1,3 +1,10 @@
+## [3.0.2](https://github.com/danielkaldheim/pyairstage/compare/v3.0.1...v3.0.2) (2025-12-08)
+
+
+### Bug Fixes
+
+* **connectivity:** exposing timeout as a user configurable parameter ([57937db](https://github.com/danielkaldheim/pyairstage/commit/57937db0a51eb5eae2c64a348fc0a731c3d4ff7d))
+
 ## [3.0.1](https://github.com/danielkaldheim/pyairstage/compare/v3.0.0...v3.0.1) (2025-12-02)
 
 
