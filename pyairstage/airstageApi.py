@@ -397,6 +397,8 @@ class ApiLocal(AirstageApi):
                     timeout=aiohttp.ClientTimeout(total=timeout_seconds),
                     data=payload,
                     headers=kwargs.get("headers"),
+                    # even if https is used, the certificates fujitsu uses do not match the IP address we're accessing by so we should always skip SSL validation as it will never work
+                    ssl=False,
                 ) as resp:
                     resp.raise_for_status()
                     data = await resp.json(content_type=None)
