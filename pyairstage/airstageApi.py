@@ -243,7 +243,7 @@ class ApiLocal(AirstageApi):
         device_id: str | None = None,
         ip_address: str | None = None,
         timeout_seconds: int = 10,
-        use_https: bool = false,
+        use_https: bool = False,
     ) -> None:
         if session is None:
             session = aiohttp.ClientSession()
