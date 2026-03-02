@@ -243,6 +243,7 @@ class ApiLocal(AirstageApi):
         device_id: str | None = None,
         ip_address: str | None = None,
         timeout_seconds: int = 10,
+        use_https: bool = false,
     ) -> None:
         if session is None:
             session = aiohttp.ClientSession()
@@ -252,6 +253,7 @@ class ApiLocal(AirstageApi):
         self.timeout_seconds = timeout_seconds
         self.device_id = device_id
         self.ip_address = ip_address
+        self.protocol = "https" if use_https else "http"
 
     async def get_devices(self):
         acInfo = await self.get_parameters(
@@ -332,7 +334,9 @@ class ApiLocal(AirstageApi):
         _LOGGER.debug(json.dumps(jsonPayload))
 
         response = await self.async_call_api(
-            "POST", f"http://{self.ip_address}/GetParam", json=json.dumps(jsonPayload)
+            "POST",
+            f"{self.protocol}://{self.ip_address}/GetParam",
+            json=json.dumps(jsonPayload),
         )
 
         _LOGGER.debug(response)
@@ -355,7 +359,9 @@ class ApiLocal(AirstageApi):
         _LOGGER.debug(json.dumps(jsonPayload))
 
         response = await self.async_call_api(
-            "POST", f"http://{self.ip_address}/SetParam", json=json.dumps(jsonPayload)
+            "POST",
+            f"{self.protocol}://{self.ip_address}/SetParam",
+            json=json.dumps(jsonPayload),
         )
 
         _LOGGER.debug(response)
