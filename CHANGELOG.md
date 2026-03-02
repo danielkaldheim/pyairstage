@@ -1,3 +1,10 @@
+## [3.1.1](https://github.com/danielkaldheim/pyairstage/compare/v3.1.0...v3.1.1) (2026-03-02)
+
+
+### Bug Fixes
+
+* **https support:** addressing syntax error ([f358495](https://github.com/danielkaldheim/pyairstage/commit/f3584954b7c29e2f5353a2da1d7b2a23be4ec869))
+
 # [3.1.0](https://github.com/danielkaldheim/pyairstage/compare/v3.0.2...v3.1.0) (2026-03-02)
 
 
