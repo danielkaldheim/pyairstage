@@ -1,3 +1,10 @@
+# [3.1.0](https://github.com/danielkaldheim/pyairstage/compare/v3.0.2...v3.1.0) (2026-03-02)
+
+
+### Features
+
+* **https support:** Exposing https as a protocol option ([1e6aa7b](https://github.com/danielkaldheim/pyairstage/commit/1e6aa7b4e87b0ac1d44e85a372e152300d300f54))
+
 ## [3.0.2](https://github.com/danielkaldheim/pyairstage/compare/v3.0.1...v3.0.2) (2025-12-08)
 
 
