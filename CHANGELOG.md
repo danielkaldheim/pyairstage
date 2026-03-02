@@ -1,3 +1,10 @@
+## [3.1.2](https://github.com/danielkaldheim/pyairstage/compare/v3.1.1...v3.1.2) (2026-03-02)
+
+
+### Bug Fixes
+
+* **https support:** skipping ssl validation ([1a9f341](https://github.com/danielkaldheim/pyairstage/commit/1a9f341d7499593d9b06032a6cf10bc2e4269bc3))
+
 ## [3.1.1](https://github.com/danielkaldheim/pyairstage/compare/v3.1.0...v3.1.1) (2026-03-02)
 
 
