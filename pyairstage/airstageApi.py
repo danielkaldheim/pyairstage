@@ -405,6 +405,8 @@ class ApiLocal(AirstageApi):
                     return data
             except SyntaxError as err:
                 raise ApiError("No valid response") from err
+            except asyncio.TimeoutError as err:
+                error = err
             except aiohttp.client_exceptions.ServerDisconnectedError as err:
                 await asyncio.sleep(1)
                 error = err
