@@ -1,3 +1,10 @@
+# [3.2.0](https://github.com/danielkaldheim/pyairstage/compare/v3.1.2...v3.2.0) (2026-04-20)
+
+
+### Features
+
+* **timeouts:** Adjusting handling of TimeoutErrors, also upping aiohttp version for more recent HA ([29092ea](https://github.com/danielkaldheim/pyairstage/commit/29092eae7ad34e824c712f9dfb6976ab1d657984))
+
 ## [3.1.2](https://github.com/danielkaldheim/pyairstage/compare/v3.1.1...v3.1.2) (2026-03-02)
 
 
