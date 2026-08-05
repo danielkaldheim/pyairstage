@@ -1,3 +1,10 @@
+## [3.2.1](https://github.com/danielkaldheim/pyairstage/compare/v3.2.0...v3.2.1) (2026-08-05)
+
+
+### Bug Fixes
+
+* **vertical swing detection:** af_inc_vrt appears to be the key to determine if vertical swing functionality exists ([bc61c78](https://github.com/danielkaldheim/pyairstage/commit/bc61c785a05178d82b4bc76356f766b6c4f29d60))
+
 # [3.2.0](https://github.com/danielkaldheim/pyairstage/compare/v3.1.2...v3.2.0) (2026-04-20)
 
 
