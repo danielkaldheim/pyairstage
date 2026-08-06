@@ -1,3 +1,10 @@
+## [3.2.2](https://github.com/danielkaldheim/pyairstage/compare/v3.2.1...v3.2.2) (2026-08-06)
+
+
+### Bug Fixes
+
+* **vertical swing detection:** Only relying on swing positions is not the case for all devices, apparently. So we'll check both ([3e60515](https://github.com/danielkaldheim/pyairstage/commit/3e6051580dfa86c0d7292fd074ad1eaddf9043e6))
+
 ## [3.2.1](https://github.com/danielkaldheim/pyairstage/compare/v3.2.0...v3.2.1) (2026-08-05)
 
 
