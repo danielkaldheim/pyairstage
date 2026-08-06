@@ -184,7 +184,9 @@ class AirstageAC:
         await self._set_device_parameter(ACParameter.TARGET_TEMPERATURE, actual_target)
 
     def get_vertical_direction(self) -> VerticalSwingPositions | None:
-        if self._is_capability_available(ACParameter.VERTICAL_SWING_POSITIONS):
+        if self._is_capability_available(
+            ACParameter.VERTICAL_DIRECTION
+        ) and self._is_capability_available(ACParameter.VERTICAL_SWING_POSITIONS):
             value = self._get_cached_device_parameter(ACParameter.VERTICAL_DIRECTION)
             total_positions = self.get_num_vertical_swing_positions()
             if total_positions == 8:
