@@ -1,7 +1,11 @@
+import logging
+
 from .constants import *
 
 from .airstageApi import AirstageApi, ApiCloud, ApiLocal
 from typing import Any
+
+_LOGGER = logging.getLogger(__name__)
 
 
 class AirstageACError(Exception):
@@ -42,8 +46,7 @@ class AirstageAC:
                 if value != CAPABILITY_NOT_AVAILABLE:
                     self._lastGoodValue[parameter_name] = value
             except ValueError as e:
-                print(f"Error processing parameter: {e}")
-                pass
+                _LOGGER.debug("Error processing parameter: %s", e)
         return self
 
     def get_cache(self):
