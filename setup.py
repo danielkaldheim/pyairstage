@@ -13,7 +13,7 @@ setuptools.setup(
     url="https://github.com/danielkaldheim/pyairstage",
     license="MIT",
     packages=["pyairstage"],
-    install_requires=["aiohttp"],
+    install_requires=["aiohttp", "cachetools"],
     classifiers=[
         "Programming Language :: Python :: 3",
         "Operating System :: OS Independent",

@@ -1,7 +1,5 @@
 import enum
 
-# version 1.0.0
-
 
 class OperationMode(enum.IntEnum):
     AUTO = 0
@@ -73,67 +71,6 @@ VALUE_TO_FAN_SPEED = {
 }
 
 
-class BooleanProperty(enum.IntEnum):
-    OFF = 0
-    ON = 1
-
-    def __str__(self):
-        return str(self._value_)
-
-
-class BooleanDescriptors(enum.Enum):
-    ON = "ON"
-    OFF = "OFF"
-
-    def __str__(self):
-        return self._value_
-
-
-VALUE_TO_BOOLEAN = {0: BooleanDescriptors.OFF, 1: BooleanDescriptors.ON}
-
-
-class VerticalSwingPositions(enum.StrEnum):
-    # Note: These strings correspond to HA swing positions
-    HIGHEST = "Highest"
-    HIGHER = "Higher"
-    HIGH = "High"
-    CENTER_HIGH = "Center High"
-    CENTER_LOW = "Center Low"
-    LOW = "Low"
-    LOWER = "Lower"
-    LOWEST = "Lowest"
-
-
-class VerticalSwing4PositionsValues(enum.IntEnum):
-    HIGHEST = 1
-    HIGH = 2
-    LOW = 3
-    LOWEST = 4
-
-
-class VerticalSwing6PositionsValues(enum.IntEnum):
-    HIGHEST = 1
-    HIGH = 2
-    CENTER_HIGH = 3
-    CENTER_LOW = 4
-    LOW = 5
-    LOWEST = 6
-
-
-class VerticalSwing8PositionsValues(enum.IntEnum):
-    HIGHEST = 1
-    HIGHER = 2
-    HIGH = 3
-    CENTER_HIGH = 4
-    CENTER_LOW = 5
-    LOW = 6
-    LOWER = 7
-    LOWEST = 8
-
-
-CAPABILITY_NOT_AVAILABLE = "65535"
-
-
 class ACParameter(enum.StrEnum):
     ONOFF_MODE = "iu_onoff"
     OPERATION_MODE = "iu_op_mode"
@@ -149,9 +86,11 @@ class ACParameter(enum.StrEnum):
     POWER_CONSUMPTION = "iu_pow_cons"
 
     REFRESH_READ_PROPERTIES = "get_prop"
+
     VERTICAL_SWING = "iu_af_swg_vrt"
     VERTICAL_SWING_POSITIONS = "iu_af_inc_vrt"
     VERTICAL_DIRECTION = "iu_af_dir_vrt"
+
     HORIZONTAL_SWING = "iu_af_swg_hrz"
     HORIZONTAL_DIRECTION = "iu_af_dir_hrz"
 
