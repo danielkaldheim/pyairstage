@@ -1,4 +1,7 @@
 import logging
+from datetime import timedelta
+
+from cachetools import TTLCache
 
 from .airstageApi import AirstageApi, ApiCloud, ApiLocal
 from .constants import *
@@ -6,6 +9,8 @@ from .constants import *
 DATA_TYPES = int | float | str | bool
 
 _LOGGER = logging.getLogger(__name__)
+
+_CAPABILITY_NOT_AVAILABLE = "65535"
 
 
 class AirstageACError(Exception):
@@ -24,8 +29,7 @@ class AirstageAC:
 
         self._dsn = dsn
         self._api = api
-        self._cache = {}
-        self._lastGoodValue = {}
+        self._lastGoodValue = TTLCache(maxsize=1000, ttl=timedelta(minutes=15).total_seconds())
 
     def refresh_parameters(
         self, data: dict[str, DATA_TYPES] | None = None
@@ -36,44 +40,43 @@ class AirstageAC:
                 raise AirstageACError(f"dsn not found {self._dsn}")
             data = devices[self._dsn]
 
-        self._cache = data
-
         for parameter in data["parameters"]:
             try:
                 name = parameter["name"]
                 value = parameter["value"]
                 parameter_name = ACParameter(name)
 
-                self._cache[parameter_name] = value
-                if value != CAPABILITY_NOT_AVAILABLE:
+                if value != _CAPABILITY_NOT_AVAILABLE:
                     self._lastGoodValue[parameter_name] = value
             except ValueError as e:
                 _LOGGER.debug("Error processing parameter: %s", e)
         return self
 
-    def get_cache(self) -> dict[str, DATA_TYPES]:
-        """Returns the current cache of device parameters."""
-        return self._cache
-
-    def _get_cached_device_parameter(
-        self, parameterName: ACParameter
-    ) -> DATA_TYPES | None:
+    def _get_device_parameter(self, parameterName: ACParameter) -> DATA_TYPES | None:
         if not isinstance(parameterName, ACParameter):
             raise AirstageACError(f"Invalid parameter name: {parameterName}")
 
-        if parameterName in self._cache:
-            value = self._cache[parameterName]
-            if (
-                value == CAPABILITY_NOT_AVAILABLE
-                and parameterName in self._lastGoodValue
-            ):
-                return self._lastGoodValue[parameterName]
-
-            return value
+        value = self._lastGoodValue.get(parameterName)
+        if value is None:
+            return None
+        if (
+            parameterName is ACParameter.INDOOR_TEMPERATURE
+            or parameterName is ACParameter.OUTDOOR_TEMPERATURE
+        ):
+            value = (int(value) - 5000) / 100
+        try:
+            # Always attempt to convert to a int
+            return int(value)
+        except ValueError:
+            try:
+                # and then try float
+                return float(value)
+            except ValueError:
+                # and then just return
+                return value
 
     def _is_capability_available(self, parameter: ACParameter) -> bool:
-        value = self._get_cached_device_parameter(parameter)
-        return value != CAPABILITY_NOT_AVAILABLE
+        return self._get_device_parameter(parameter) is not None
 
     async def _set_device_parameter(
         self, parameterName: ACParameter, value: DATA_TYPES
@@ -83,35 +86,24 @@ class AirstageAC:
 
         updatedValue = await self._api.set_parameter(self._dsn, parameterName, value)
         if updatedValue is not None:
-            self._cache[parameterName] = value
+            self._lastGoodValue[parameterName] = value
             return value
 
-    def get_device_parameter(self, parameterName: ACParameter) -> DATA_TYPES | None:
-        value = self._lastGoodValue[parameterName]
-        if (
-            parameterName is ACParameter.INDOOR_TEMPERATURE
-            or parameterName is ACParameter.OUTDOOR_TEMPERATURE
-        ):
-            value = (int(value) - 5000) / 100 if value is not None else None
-        return value
-
-    def get_device_name(self) -> str | None:
-        return self._get_cached_device_parameter(ACParameter.DEVICE_NAME)
-
-    def get_device_on_off_state(self) -> bool | None:
-        raw = self._get_cached_device_parameter(ACParameter.ONOFF_MODE)
-        return VALUE_TO_BOOLEAN.get(int(raw))
-
     async def _set_boolean(self, param: ACParameter, value: bool):
-        await self.set_device_parameter(
-            param, BooleanProperty.ON if value else BooleanProperty.OFF
-        )
+        await self._set_device_parameter(param, "1" if value else "0")
 
     def _get_boolean(self, param: ACParameter) -> bool | None:
         if self._is_capability_available(param):
-            value = self._get_cached_device_parameter(param)
-            return bool(value) if value is not None else None
+            value = self._get_device_parameter(param)
+            return bool(int(value)) if value is not None else None
         return None
+
+    def get_device_name(self) -> str | None:
+        return self._get_device_parameter(ACParameter.DEVICE_NAME)
+
+    def get_device_on_off_state(self) -> bool | None:
+        raw = self._get_device_parameter(ACParameter.ONOFF_MODE)
+        return bool(raw)
 
     async def turn_on(self):
         await self._set_boolean(ACParameter.ONOFF_MODE, True)
@@ -120,10 +112,10 @@ class AirstageAC:
         await self._set_boolean(ACParameter.ONOFF_MODE, False)
 
     def get_operating_mode(self) -> OperationModeDescriptors | None:
-        if int(self._get_cached_device_parameter(ACParameter.ONOFF_MODE)) == 0:
+        if int(self._get_device_parameter(ACParameter.ONOFF_MODE)) == 0:
             return OperationModeDescriptors.OFF
         return VALUE_TO_OPERATION_MODE.get(
-            int(self._get_cached_device_parameter(ACParameter.OPERATION_MODE))
+            int(self._get_device_parameter(ACParameter.OPERATION_MODE))
         )
 
     async def set_operation_mode(self, mode: OperationMode):
@@ -133,7 +125,7 @@ class AirstageAC:
 
     def get_fan_speed(self) -> FanSpeedDescriptors | None:
         return VALUE_TO_FAN_SPEED.get(
-            int(self._get_cached_device_parameter(ACParameter.FAN_SPEED))
+            int(self._get_device_parameter(ACParameter.FAN_SPEED))
         )
 
     async def set_fan_speed(self, fan_speed: FanSpeed):
@@ -143,20 +135,17 @@ class AirstageAC:
 
     def get_display_temperature(self) -> float | None:
         if self._is_capability_available(ACParameter.INDOOR_TEMPERATURE):
-            return self.get_device_parameter(ACParameter.INDOOR_TEMPERATURE)
+            return self._get_device_parameter(ACParameter.INDOOR_TEMPERATURE)
         return None
 
     def get_outdoor_temperature(self) -> float | None:
         if self._is_capability_available(ACParameter.OUTDOOR_TEMPERATURE):
-            return self.get_device_parameter(ACParameter.OUTDOOR_TEMPERATURE)
+            return self._get_device_parameter(ACParameter.OUTDOOR_TEMPERATURE)
         return None
 
     def get_target_temperature(self) -> float | None:
         if self._is_capability_available(ACParameter.TARGET_TEMPERATURE):
-            return (
-                int(self._get_cached_device_parameter(ACParameter.TARGET_TEMPERATURE))
-                / 10
-            )
+            return int(self._get_device_parameter(ACParameter.TARGET_TEMPERATURE)) / 10
         return None
 
     def get_minimum_temperature(self) -> float | None:
@@ -203,56 +192,30 @@ class AirstageAC:
         actual_target = int(rounded_temp * 10)
         await self._set_device_parameter(ACParameter.TARGET_TEMPERATURE, actual_target)
 
-    def get_vertical_direction(self) -> VerticalSwingPositions | None:
-        if self._is_capability_available(
-            ACParameter.VERTICAL_DIRECTION
-        ) and self._is_capability_available(ACParameter.VERTICAL_SWING_POSITIONS):
-            value = self._get_cached_device_parameter(ACParameter.VERTICAL_DIRECTION)
-            total_positions = self.get_num_vertical_swing_positions()
-            if total_positions == 8:
-                return VerticalSwingPositions.get(
-                    VerticalSwing8PositionsValues(int(value)).name
-                )
-            elif total_positions == 6:
-                return VerticalSwingPositions.get(
-                    VerticalSwing6PositionsValues(int(value)).name
-                )
-            elif total_positions == 4:
-                return VerticalSwingPositions.get(
-                    VerticalSwing4PositionsValues(int(value)).name
-                )
-            else:
-                raise AirstageACError(
-                    f"Invalid total_positions value: {total_positions}. Only 4, 6 and 8 are supported"
-                )
+    def get_vertical_direction(self) -> int | None:
+        if self._is_capability_available(ACParameter.VERTICAL_DIRECTION):
+            return self._get_device_parameter(ACParameter.VERTICAL_DIRECTION)
         return None
 
-    async def set_vertical_direction(self, direction: VerticalSwingPositions):
-        if not isinstance(direction, VerticalSwingPositions):
+    async def set_vertical_direction(self, direction_value: int):
+        total_positions = self.get_num_vertical_positions()
+
+        if direction_value <= 0:
             raise AirstageACError(
-                f"Invalid fan direction value: {type(direction)}: {direction}"
+                f"Invalid direction value: {direction_value}, values start at 1"
             )
-        total_positions = self.get_num_vertical_swing_positions()
-        if total_positions == 8:
-            direction_value = VerticalSwing8PositionsValues[direction.name]
-        elif total_positions == 6:
-            direction_value = VerticalSwing6PositionsValues[direction.name]
-        elif total_positions == 4:
-            direction_value = VerticalSwing4PositionsValues[direction.name]
-        else:
+        if direction_value > total_positions:
             raise AirstageACError(
-                f"Invalid total_positions value: {total_positions}. Only 4, 6 and 8 are supported"
+                f"Invalid direction value: {direction_value}, only {total_positions} are supported"
             )
 
         await self._set_device_parameter(
             ACParameter.VERTICAL_DIRECTION, direction_value
         )
 
-    def get_num_vertical_swing_positions(self) -> int:
-        """We have observed this being 4 or 6"""
-        return int(
-            self._get_cached_device_parameter(ACParameter.VERTICAL_SWING_POSITIONS)
-        )
+    def get_num_vertical_positions(self) -> int:
+        """We have observed this being 4, 6, and 8"""
+        return int(self._get_device_parameter(ACParameter.VERTICAL_SWING_POSITIONS))
 
     def get_vertical_swing(self) -> bool | None:
         return self._get_boolean(ACParameter.VERTICAL_SWING)
