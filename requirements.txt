@@ -1,1 +1,2 @@
 aiohttp>=3.13.5
+cachetools>=7
