@@ -29,7 +29,9 @@ class AirstageAC:
 
         self._dsn = dsn
         self._api = api
-        self._lastGoodValue = TTLCache(maxsize=1000, ttl=timedelta(minutes=15).total_seconds())
+        self._lastGoodValue = TTLCache(
+            maxsize=1000, ttl=timedelta(minutes=15).total_seconds()
+        )
 
     def refresh_parameters(
         self, data: dict[str, DATA_TYPES] | None = None
@@ -85,7 +87,7 @@ class AirstageAC:
             raise AirstageACError(f"Invalid property name: {parameterName}")
 
         updatedValue = await self._api.set_parameter(self._dsn, parameterName, value)
-        if updatedValue is not None:
+        if updatedValue is not None and updatedValue.get("result") == "OK":
             self._lastGoodValue[parameterName] = value
             return value
 
