@@ -1,11 +1,12 @@
-import logging
-import time
-import os
-import json
-from typing import Any, Coroutine
-import uuid
 import asyncio
+import json
+import logging
+import os
+import time
+import uuid
+
 import aiohttp
+
 from .constants import ACParameter
 
 HEADER_CONTENT_TYPE = "Content-Type"
@@ -17,13 +18,11 @@ HEADER_AUTHORIZATION = "Authorization"
 class AirstageApi:
     """Airstage API"""
 
-    async def get_devices(self) -> Coroutine[Any, Any, dict]:
+    async def get_devices(self) -> dict[str, dict]:
         """Get account devices"""
-        pass
 
     async def set_parameter(self, dsn: str, name: str, value: str):
         """Get set device parameter"""
-        pass
 
 
 class ApiError(Exception):
@@ -121,7 +120,7 @@ class ApiCloud(AirstageApi):
         f.write(json.dumps(response))
         return access_token
 
-    async def get_devices(self):
+    async def get_devices(self) -> dict[str, dict]:
         access_token = await self._read_token()
         response = await self.async_call_api(
             "GET",
@@ -157,7 +156,7 @@ class ApiCloud(AirstageApi):
         method: str,
         url: str,
         access_token: str | None = None,
-        retry: int = None,
+        retry: int | None = None,
         **kwargs,
     ):
         retry = retry or self.retry
@@ -173,9 +172,8 @@ class ApiCloud(AirstageApi):
             else:
                 kwargs["headers"] = _api_headers()
 
-        if method.lower() == "post":
-            if not payload:
-                raise ApiError(f"Post method needs a request body!")
+        if method.lower() == "post" and not payload:
+            raise ApiError("Post method needs a request body!")
 
         while count < retry:
             count += 1
@@ -197,18 +195,18 @@ class ApiCloud(AirstageApi):
                 ConnectionResetError,
             ) as err:
                 error = err
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 error = "Connection timed out."
             except AssertionError:
                 error = "Response status not 200."
                 break
-            except SyntaxError as err:
+            except SyntaxError:
                 error = "Invalid response"
                 break
 
             await asyncio.sleep(1)
         raise ApiError(
-            f"No valid response after {count} failed attempt{['','s'][count>1]}. Last error was: {error}"
+            f"No valid response after {count} failed attempt{['', 's'][count > 1]}. Last error was: {error}"
         )
 
     async def _read_token(self, access_token_file=None) -> str | None:
@@ -218,9 +216,8 @@ class ApiCloud(AirstageApi):
             os.path.exists(access_token_file)
             and os.stat(access_token_file).st_size != 0
         ):
-            f = open(access_token_file, "r", encoding="utf8")
-            access_token_file_content = f.read()
-            data = json.loads(access_token_file_content)
+            with open(access_token_file, "r", encoding="utf8") as f:
+                data = json.load(f)
             now = int(time.time())
             if data["accessToken"]:
                 access_token = data["accessToken"]
@@ -234,7 +231,6 @@ class ApiCloud(AirstageApi):
 
 class ApiLocal(AirstageApi):
     _GET_PARAMETER_BODY = '{"device_id": "%s","device_sub_id": %i,"req_id": "","modified_by": "","set_level": "%s","list": %s }'
-    _GET_PARAMETER_BODY = ""
 
     def __init__(
         self,
@@ -255,7 +251,7 @@ class ApiLocal(AirstageApi):
         self.ip_address = ip_address
         self.protocol = "https" if use_https else "http"
 
-    async def get_devices(self):
+    async def get_devices(self) -> dict[str, dict]:
         acInfo = await self.get_parameters(
             [
                 ACParameter.MODEL,
@@ -344,7 +340,7 @@ class ApiLocal(AirstageApi):
         if "result" in response and response["result"] == "OK":
             return response["value"]
 
-        raise ApiError(f"Get parameter failed")
+        raise ApiError("Get parameter failed")
 
     async def set_parameter(self, dsn: str, name: str, value: str):
         jsonPayload = {
@@ -384,9 +380,8 @@ class ApiLocal(AirstageApi):
 
         payload = kwargs.get("json")
 
-        if method.lower() == "post":
-            if not payload:
-                raise ApiError(f"Post method needs a request body!")
+        if method.lower() == "post" and not payload:
+            raise ApiError("Post method needs a request body!")
 
         while count < retry:
             count += 1
@@ -403,11 +398,23 @@ class ApiLocal(AirstageApi):
                     resp.raise_for_status()
                     data = await resp.json(content_type=None)
                     return data
-            except SyntaxError as err:
-                raise ApiError("No valid response") from err
-            except asyncio.TimeoutError as err:
+            except (
+                aiohttp.ClientError,
+                aiohttp.ClientConnectorError,
+                aiohttp.client_exceptions.ServerDisconnectedError,
+                ConnectionResetError,
+            ) as err:
                 error = err
-            except aiohttp.client_exceptions.ServerDisconnectedError as err:
-                await asyncio.sleep(1)
-                error = err
-        raise error
+            except TimeoutError:
+                error = "Connection timed out."
+            except AssertionError:
+                error = "Response status not 200."
+                break
+            except SyntaxError:
+                error = "Invalid response"
+                break
+
+            await asyncio.sleep(1)
+        raise ApiError(
+            f"No valid response after {count} failed attempt{['', 's'][count > 1]}. Last error was: {error}"
+        )
