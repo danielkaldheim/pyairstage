@@ -152,8 +152,8 @@ class ACParameter(enum.StrEnum):
     VERTICAL_SWING = "iu_af_swg_vrt"
     VERTICAL_SWING_POSITIONS = "iu_af_inc_vrt"
     VERTICAL_DIRECTION = "iu_af_dir_vrt"
-    HORIZONTAL_SWING = "iu_af_dir_hrz"
-    HORIZONTAL_DIRECTION = "iu_af_swg_hrz"
+    HORIZONTAL_SWING = "iu_af_swg_hrz"
+    HORIZONTAL_DIRECTION = "iu_af_dir_hrz"
 
     HMN_DETECTION = "iu_hmn_det"
     HMN_DETECTION_AUTO_SAVE = "iu_hmn_det_auto_save"

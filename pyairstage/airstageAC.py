@@ -102,11 +102,22 @@ class AirstageAC:
         raw = self._get_cached_device_parameter(ACParameter.ONOFF_MODE)
         return VALUE_TO_BOOLEAN.get(int(raw))
 
+    async def _set_boolean(self, param: ACParameter, value: bool):
+        await self.set_device_parameter(
+            param, BooleanProperty.ON if value else BooleanProperty.OFF
+        )
+
+    def _get_boolean(self, param: ACParameter) -> bool | None:
+        if self._is_capability_available(param):
+            value = self._get_cached_device_parameter(param)
+            return bool(value) if value is not None else None
+        return None
+
     async def turn_on(self):
-        await self._set_device_parameter(ACParameter.ONOFF_MODE, BooleanProperty.ON)
+        await self._set_boolean(ACParameter.ONOFF_MODE, True)
 
     async def turn_off(self):
-        await self._set_device_parameter(ACParameter.ONOFF_MODE, BooleanProperty.OFF)
+        await self._set_boolean(ACParameter.ONOFF_MODE, False)
 
     def get_operating_mode(self) -> OperationModeDescriptors | None:
         if int(self._get_cached_device_parameter(ACParameter.ONOFF_MODE)) == 0:
@@ -243,97 +254,59 @@ class AirstageAC:
             self._get_cached_device_parameter(ACParameter.VERTICAL_SWING_POSITIONS)
         )
 
-    def get_vertical_swing(self) -> BooleanDescriptors | None:
-        if self._is_capability_available(ACParameter.VERTICAL_SWING):
-            value = self._get_cached_device_parameter(ACParameter.VERTICAL_SWING)
-            return VALUE_TO_BOOLEAN.get(int(value)) if value is not None else None
-        return None
+    def get_vertical_swing(self) -> bool | None:
+        return self._get_boolean(ACParameter.VERTICAL_SWING)
 
-    async def set_vertical_swing(self, mode: BooleanProperty):
-        if not isinstance(mode, BooleanProperty):
-            raise AirstageACError(f"Invalid mode value: {mode}")
-        await self._set_device_parameter(ACParameter.VERTICAL_SWING, mode)
+    async def set_vertical_swing(self, value: bool):
+        await self._set_boolean(ACParameter.VERTICAL_SWING, value)
 
-    def get_economy_mode(self) -> BooleanDescriptors | None:
-        if self._is_capability_available(ACParameter.ECONOMY_MODE):
-            value = self._get_cached_device_parameter(ACParameter.ECONOMY_MODE)
-            return VALUE_TO_BOOLEAN.get(int(value)) if value is not None else None
-        return None
+    def get_horizontal_swing(self) -> bool | None:
+        return self._get_boolean(ACParameter.HORIZONTAL_SWING)
 
-    async def set_economy_mode(self, mode: BooleanProperty):
-        if not isinstance(mode, BooleanProperty):
-            raise AirstageACError(f"Invalid mode value: {mode}")
-        await self._set_device_parameter(ACParameter.ECONOMY_MODE, mode)
+    async def set_horizontal_swing(self, value: bool):
+        await self._set_boolean(ACParameter.HORIZONTAL_SWING, value)
 
-    def get_energy_save_fan(self) -> BooleanDescriptors | None:
-        return VALUE_TO_BOOLEAN.get(
-            int(self._get_cached_device_parameter(ACParameter.ENERGY_SAVE_FAN))
-        )
+    def get_economy_mode(self) -> bool | None:
+        return self._get_boolean(ACParameter.ECONOMY_MODE)
 
-    async def set_energy_save_fan(self, mode: BooleanProperty):
-        if not isinstance(mode, BooleanProperty):
-            raise AirstageACError(f"Invalid mode value: {mode}")
-        await self._set_device_parameter(ACParameter.ENERGY_SAVE_FAN, mode)
+    async def set_economy_mode(self, value: bool):
+        await self._set_boolean(ACParameter.ECONOMY_MODE, value)
 
-    def get_powerful_mode(self) -> BooleanDescriptors | None:
-        if self._is_capability_available(ACParameter.POWERFUL_MODE):
-            value = self._get_cached_device_parameter(ACParameter.POWERFUL_MODE)
-            return VALUE_TO_BOOLEAN.get(int(value)) if value is not None else None
-        return None
+    def get_energy_save_fan(self) -> bool | None:
+        return self._get_boolean(ACParameter.ENERGY_SAVE_FAN)
 
-    async def set_powerful_mode(self, mode: BooleanProperty):
-        if not isinstance(mode, BooleanProperty):
-            raise AirstageACError(f"Invalid mode value: {mode}")
-        await self._set_device_parameter(ACParameter.POWERFUL_MODE, mode)
+    async def set_energy_save_fan(self, value: bool):
+        await self._set_boolean(ACParameter.ENERGY_SAVE_FAN, value)
 
-    def get_outdoor_low_noise(self) -> BooleanDescriptors | None:
-        if self._is_capability_available(ACParameter.OUTDOOR_LOW_NOISE):
-            value = self._get_cached_device_parameter(ACParameter.OUTDOOR_LOW_NOISE)
-            return VALUE_TO_BOOLEAN.get(int(value)) if value is not None else None
-        return None
+    def get_powerful_mode(self) -> bool | None:
+        return self._get_boolean(ACParameter.POWERFUL_MODE)
 
-    async def set_outdoor_low_noise(self, mode: BooleanProperty):
-        if not isinstance(mode, BooleanProperty):
-            raise AirstageACError(f"Invalid mode value: {mode}")
-        await self._set_device_parameter(ACParameter.OUTDOOR_LOW_NOISE, mode)
+    async def set_powerful_mode(self, value: bool):
+        await self._set_boolean(ACParameter.POWERFUL_MODE, value)
 
-    def get_indoor_led(self) -> BooleanDescriptors | None:
-        if self._is_capability_available(ACParameter.INDOOR_LED):
-            value = self._get_cached_device_parameter(ACParameter.INDOOR_LED)
-            return VALUE_TO_BOOLEAN.get(int(value)) if value is not None else None
-        return None
+    def get_outdoor_low_noise(self) -> bool | None:
+        return self._get_boolean(ACParameter.OUTDOOR_LOW_NOISE)
 
-    async def set_indoor_led(self, mode: BooleanProperty):
-        if not isinstance(mode, BooleanProperty):
-            raise AirstageACError(f"Invalid mode value: {mode}")
-        await self._set_device_parameter(ACParameter.INDOOR_LED, mode)
+    async def set_outdoor_low_noise(self, value: bool):
+        await self._set_boolean(ACParameter.OUTDOOR_LOW_NOISE, value)
 
-    def get_minimum_heat(self) -> BooleanDescriptors | None:
-        if self._is_capability_available(ACParameter.MINIMUM_HEAT):
-            value = self._get_cached_device_parameter(ACParameter.MINIMUM_HEAT)
-            return VALUE_TO_BOOLEAN.get(int(value)) if value is not None else None
-        return None
+    def get_indoor_led(self) -> bool | None:
+        return self._get_boolean(ACParameter.INDOOR_LED)
 
-    async def set_minimum_heat(self, mode: BooleanProperty):
-        if not isinstance(mode, BooleanProperty):
-            raise AirstageACError(f"Invalid mode value: {mode}")
-        await self._set_device_parameter(ACParameter.MINIMUM_HEAT, mode)
+    async def set_indoor_led(self, value: bool):
+        await self._set_boolean(ACParameter.INDOOR_LED, value)
 
-    def get_hmn_detection(self) -> BooleanDescriptors | None:
-        if self._is_capability_available(ACParameter.HMN_DETECTION):
-            value = self._get_cached_device_parameter(ACParameter.HMN_DETECTION)
-            return VALUE_TO_BOOLEAN.get(int(value)) if value is not None else None
-        return None
+    def get_minimum_heat(self) -> bool | None:
+        return self._get_boolean(ACParameter.MINIMUM_HEAT)
 
-    def get_hmn_detection_auto_save(self) -> BooleanDescriptors | None:
-        if self._is_capability_available(ACParameter.HMN_DETECTION_AUTO_SAVE):
-            value = self._get_cached_device_parameter(
-                ACParameter.HMN_DETECTION_AUTO_SAVE
-            )
-            return VALUE_TO_BOOLEAN.get(int(value)) if value is not None else None
-        return None
+    async def set_minimum_heat(self, value: bool):
+        await self._set_boolean(ACParameter.MINIMUM_HEAT, value)
 
-    async def set_hmn_detection_auto_save(self, mode: BooleanProperty):
-        if not isinstance(mode, BooleanProperty):
-            raise AirstageACError(f"Invalid mode value: {mode}")
-        await self._set_device_parameter(ACParameter.HMN_DETECTION_AUTO_SAVE, mode)
+    def get_hmn_detection(self) -> bool | None:
+        return self._get_boolean(ACParameter.HMN_DETECTION)
+
+    def get_hmn_detection_auto_save(self) -> bool | None:
+        return self._get_boolean(ACParameter.HMN_DETECTION_AUTO_SAVE)
+
+    async def set_hmn_detection_auto_save(self, value: bool):
+        await self._set_boolean(ACParameter.HMN_DETECTION_AUTO_SAVE, value)
