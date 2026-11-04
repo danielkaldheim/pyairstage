@@ -1,9 +1,9 @@
 import logging
 
+from .airstageApi import AirstageApi, ApiCloud, ApiLocal
 from .constants import *
 
-from .airstageApi import AirstageApi, ApiCloud, ApiLocal
-from typing import Any
+DATA_TYPES = int | float | str | bool
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -15,7 +15,7 @@ class AirstageACError(Exception):
 class AirstageAC:
     """Class to represent an Airstage Air Conditioner."""
 
-    def __init__(self, dsn: str, api: AirstageApi | ApiCloud | ApiLocal) -> None:
+    def __init__(self, dsn: str, api: AirstageApi | ApiCloud | ApiLocal):
         if not api:
             raise AirstageACError("Missing api")
 
@@ -27,7 +27,9 @@ class AirstageAC:
         self._cache = {}
         self._lastGoodValue = {}
 
-    def refresh_parameters(self, data: dict | None = None):
+    def refresh_parameters(
+        self, data: dict[str, DATA_TYPES] | None = None
+    ) -> AirstageAC:
         if not data:
             devices = self._api.get_devices()
             if not isinstance(self._dsn, devices):
@@ -49,11 +51,13 @@ class AirstageAC:
                 _LOGGER.debug("Error processing parameter: %s", e)
         return self
 
-    def get_cache(self):
+    def get_cache(self) -> dict[str, DATA_TYPES]:
         """Returns the current cache of device parameters."""
         return self._cache
 
-    def _get_cached_device_parameter(self, parameterName: ACParameter) -> Any:
+    def _get_cached_device_parameter(
+        self, parameterName: ACParameter
+    ) -> DATA_TYPES | None:
         if not isinstance(parameterName, ACParameter):
             raise AirstageACError(f"Invalid parameter name: {parameterName}")
 
@@ -71,7 +75,9 @@ class AirstageAC:
         value = self._get_cached_device_parameter(parameter)
         return value != CAPABILITY_NOT_AVAILABLE
 
-    async def _set_device_parameter(self, parameterName: ACParameter, value):
+    async def _set_device_parameter(
+        self, parameterName: ACParameter, value: DATA_TYPES
+    ) -> DATA_TYPES | None:
         if not isinstance(parameterName, ACParameter):
             raise AirstageACError(f"Invalid property name: {parameterName}")
 
@@ -80,7 +86,7 @@ class AirstageAC:
             self._cache[parameterName] = value
             return value
 
-    def get_device_parameter(self, parameterName: ACParameter) -> Any:
+    def get_device_parameter(self, parameterName: ACParameter) -> DATA_TYPES | None:
         value = self._lastGoodValue[parameterName]
         if (
             parameterName is ACParameter.INDOOR_TEMPERATURE
@@ -89,13 +95,12 @@ class AirstageAC:
             value = (int(value) - 5000) / 100 if value is not None else None
         return value
 
-    def get_device_name(self) -> str:
-        return str(self._get_cached_device_parameter(ACParameter.DEVICE_NAME))
+    def get_device_name(self) -> str | None:
+        return self._get_cached_device_parameter(ACParameter.DEVICE_NAME)
 
-    def get_device_on_off_state(self):
-        return VALUE_TO_BOOLEAN[
-            int(self._get_cached_device_parameter(ACParameter.ONOFF_MODE))
-        ]
+    def get_device_on_off_state(self) -> bool | None:
+        raw = self._get_cached_device_parameter(ACParameter.ONOFF_MODE)
+        return VALUE_TO_BOOLEAN.get(int(raw))
 
     async def turn_on(self):
         await self._set_device_parameter(ACParameter.ONOFF_MODE, BooleanProperty.ON)
@@ -103,22 +108,22 @@ class AirstageAC:
     async def turn_off(self):
         await self._set_device_parameter(ACParameter.ONOFF_MODE, BooleanProperty.OFF)
 
-    def get_operating_mode(self):
+    def get_operating_mode(self) -> OperationModeDescriptors | None:
         if int(self._get_cached_device_parameter(ACParameter.ONOFF_MODE)) == 0:
             return OperationModeDescriptors.OFF
-        return VALUE_TO_OPERATION_MODE[
+        return VALUE_TO_OPERATION_MODE.get(
             int(self._get_cached_device_parameter(ACParameter.OPERATION_MODE))
-        ]
+        )
 
     async def set_operation_mode(self, mode: OperationMode):
         if not isinstance(mode, OperationMode):
             raise AirstageACError(f"Invalid operationMode value: {mode}")
         await self._set_device_parameter(ACParameter.OPERATION_MODE, mode)
 
-    def get_fan_speed(self):
-        return VALUE_TO_FAN_SPEED[
+    def get_fan_speed(self) -> FanSpeedDescriptors | None:
+        return VALUE_TO_FAN_SPEED.get(
             int(self._get_cached_device_parameter(ACParameter.FAN_SPEED))
-        ]
+        )
 
     async def set_fan_speed(self, fan_speed: FanSpeed):
         if not isinstance(fan_speed, FanSpeed):
@@ -126,21 +131,22 @@ class AirstageAC:
         await self._set_device_parameter(ACParameter.FAN_SPEED, fan_speed)
 
     def get_display_temperature(self) -> float | None:
-        if self._is_capability_available(ACParameter.INDOOR_TEMPERATURE) == False:
-            return None
-        return self.get_device_parameter(ACParameter.INDOOR_TEMPERATURE)
+        if self._is_capability_available(ACParameter.INDOOR_TEMPERATURE):
+            return self.get_device_parameter(ACParameter.INDOOR_TEMPERATURE)
+        return None
 
     def get_outdoor_temperature(self) -> float | None:
-        if self._is_capability_available(ACParameter.OUTDOOR_TEMPERATURE) == False:
-            return None
-        return self.get_device_parameter(ACParameter.OUTDOOR_TEMPERATURE)
+        if self._is_capability_available(ACParameter.OUTDOOR_TEMPERATURE):
+            return self.get_device_parameter(ACParameter.OUTDOOR_TEMPERATURE)
+        return None
 
     def get_target_temperature(self) -> float | None:
-        if self._is_capability_available(ACParameter.TARGET_TEMPERATURE) == False:
-            return None
-        return (
-            int(self._get_cached_device_parameter(ACParameter.TARGET_TEMPERATURE)) / 10
-        )
+        if self._is_capability_available(ACParameter.TARGET_TEMPERATURE):
+            return (
+                int(self._get_cached_device_parameter(ACParameter.TARGET_TEMPERATURE))
+                / 10
+            )
+        return None
 
     def get_minimum_temperature(self) -> float | None:
         match self.get_operating_mode():
@@ -193,17 +199,17 @@ class AirstageAC:
             value = self._get_cached_device_parameter(ACParameter.VERTICAL_DIRECTION)
             total_positions = self.get_num_vertical_swing_positions()
             if total_positions == 8:
-                return VerticalSwingPositions[
+                return VerticalSwingPositions.get(
                     VerticalSwing8PositionsValues(int(value)).name
-                ]
+                )
             elif total_positions == 6:
-                return VerticalSwingPositions[
+                return VerticalSwingPositions.get(
                     VerticalSwing6PositionsValues(int(value)).name
-                ]
+                )
             elif total_positions == 4:
-                return VerticalSwingPositions[
+                return VerticalSwingPositions.get(
                     VerticalSwing4PositionsValues(int(value)).name
-                ]
+                )
             else:
                 raise AirstageACError(
                     f"Invalid total_positions value: {total_positions}. Only 4, 6 and 8 are supported"
@@ -240,7 +246,7 @@ class AirstageAC:
     def get_vertical_swing(self) -> BooleanDescriptors | None:
         if self._is_capability_available(ACParameter.VERTICAL_SWING):
             value = self._get_cached_device_parameter(ACParameter.VERTICAL_SWING)
-            return VALUE_TO_BOOLEAN[int(value)] if value is not None else None
+            return VALUE_TO_BOOLEAN.get(int(value)) if value is not None else None
         return None
 
     async def set_vertical_swing(self, mode: BooleanProperty):
@@ -251,7 +257,7 @@ class AirstageAC:
     def get_economy_mode(self) -> BooleanDescriptors | None:
         if self._is_capability_available(ACParameter.ECONOMY_MODE):
             value = self._get_cached_device_parameter(ACParameter.ECONOMY_MODE)
-            return VALUE_TO_BOOLEAN[int(value)] if value is not None else None
+            return VALUE_TO_BOOLEAN.get(int(value)) if value is not None else None
         return None
 
     async def set_economy_mode(self, mode: BooleanProperty):
@@ -259,10 +265,10 @@ class AirstageAC:
             raise AirstageACError(f"Invalid mode value: {mode}")
         await self._set_device_parameter(ACParameter.ECONOMY_MODE, mode)
 
-    def get_energy_save_fan(self):
-        return VALUE_TO_BOOLEAN[
+    def get_energy_save_fan(self) -> BooleanDescriptors | None:
+        return VALUE_TO_BOOLEAN.get(
             int(self._get_cached_device_parameter(ACParameter.ENERGY_SAVE_FAN))
-        ]
+        )
 
     async def set_energy_save_fan(self, mode: BooleanProperty):
         if not isinstance(mode, BooleanProperty):
@@ -272,7 +278,7 @@ class AirstageAC:
     def get_powerful_mode(self) -> BooleanDescriptors | None:
         if self._is_capability_available(ACParameter.POWERFUL_MODE):
             value = self._get_cached_device_parameter(ACParameter.POWERFUL_MODE)
-            return VALUE_TO_BOOLEAN[int(value)] if value is not None else None
+            return VALUE_TO_BOOLEAN.get(int(value)) if value is not None else None
         return None
 
     async def set_powerful_mode(self, mode: BooleanProperty):
@@ -283,7 +289,7 @@ class AirstageAC:
     def get_outdoor_low_noise(self) -> BooleanDescriptors | None:
         if self._is_capability_available(ACParameter.OUTDOOR_LOW_NOISE):
             value = self._get_cached_device_parameter(ACParameter.OUTDOOR_LOW_NOISE)
-            return VALUE_TO_BOOLEAN[int(value)] if value is not None else None
+            return VALUE_TO_BOOLEAN.get(int(value)) if value is not None else None
         return None
 
     async def set_outdoor_low_noise(self, mode: BooleanProperty):
@@ -294,7 +300,7 @@ class AirstageAC:
     def get_indoor_led(self) -> BooleanDescriptors | None:
         if self._is_capability_available(ACParameter.INDOOR_LED):
             value = self._get_cached_device_parameter(ACParameter.INDOOR_LED)
-            return VALUE_TO_BOOLEAN[int(value)] if value is not None else None
+            return VALUE_TO_BOOLEAN.get(int(value)) if value is not None else None
         return None
 
     async def set_indoor_led(self, mode: BooleanProperty):
@@ -305,7 +311,7 @@ class AirstageAC:
     def get_minimum_heat(self) -> BooleanDescriptors | None:
         if self._is_capability_available(ACParameter.MINIMUM_HEAT):
             value = self._get_cached_device_parameter(ACParameter.MINIMUM_HEAT)
-            return VALUE_TO_BOOLEAN[int(value)] if value is not None else None
+            return VALUE_TO_BOOLEAN.get(int(value)) if value is not None else None
         return None
 
     async def set_minimum_heat(self, mode: BooleanProperty):
@@ -316,13 +322,7 @@ class AirstageAC:
     def get_hmn_detection(self) -> BooleanDescriptors | None:
         if self._is_capability_available(ACParameter.HMN_DETECTION):
             value = self._get_cached_device_parameter(ACParameter.HMN_DETECTION)
-            return VALUE_TO_BOOLEAN[int(value)] if value is not None else None
-        return None
-
-    def get_hmn_detection(self) -> BooleanDescriptors | None:
-        if self._is_capability_available(ACParameter.HMN_DETECTION):
-            value = self._get_cached_device_parameter(ACParameter.HMN_DETECTION)
-            return VALUE_TO_BOOLEAN[int(value)] if value is not None else None
+            return VALUE_TO_BOOLEAN.get(int(value)) if value is not None else None
         return None
 
     def get_hmn_detection_auto_save(self) -> BooleanDescriptors | None:
@@ -330,7 +330,7 @@ class AirstageAC:
             value = self._get_cached_device_parameter(
                 ACParameter.HMN_DETECTION_AUTO_SAVE
             )
-            return VALUE_TO_BOOLEAN[int(value)] if value is not None else None
+            return VALUE_TO_BOOLEAN.get(int(value)) if value is not None else None
         return None
 
     async def set_hmn_detection_auto_save(self, mode: BooleanProperty):
