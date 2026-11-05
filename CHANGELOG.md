@@ -1,3 +1,10 @@
+## [4.0.1](https://github.com/danielkaldheim/pyairstage/compare/v4.0.0...v4.0.1) (2026-11-05)
+
+
+### Bug Fixes
+
+* **cache:** exposing TTL for cache for easy configuration ([3ed4b10](https://github.com/danielkaldheim/pyairstage/commit/3ed4b1038f67d0a131a132fa780b4705583b17b4))
+
 # [4.0.0](https://github.com/danielkaldheim/pyairstage/compare/v3.2.2...v4.0.0) (2026-11-05)
 
 
