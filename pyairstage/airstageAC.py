@@ -20,7 +20,12 @@ class AirstageACError(Exception):
 class AirstageAC:
     """Class to represent an Airstage Air Conditioner."""
 
-    def __init__(self, dsn: str, api: AirstageApi | ApiCloud | ApiLocal):
+    def __init__(
+        self,
+        dsn: str,
+        api: AirstageApi | ApiCloud | ApiLocal,
+        cache_duration: float = timedelta(minutes=15).total_seconds(),
+    ):
         if not api:
             raise AirstageACError("Missing api")
 
@@ -29,9 +34,7 @@ class AirstageAC:
 
         self._dsn = dsn
         self._api = api
-        self._lastGoodValue = TTLCache(
-            maxsize=1000, ttl=timedelta(minutes=15).total_seconds()
-        )
+        self._lastGoodValue = TTLCache(maxsize=1000, ttl=cache_duration)
 
     def refresh_parameters(
         self, data: dict[str, DATA_TYPES] | None = None
