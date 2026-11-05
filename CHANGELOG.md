@@ -1,3 +1,18 @@
+# [4.0.0](https://github.com/danielkaldheim/pyairstage/compare/v3.2.2...v4.0.0) (2026-11-05)
+
+
+### Bug Fixes
+
+* **cache:** getting rid of the base cache entirely, we're only storing known good values now in a 15 minutes ttl ([36aa60e](https://github.com/danielkaldheim/pyairstage/commit/36aa60e9b35d794f2da0f4b4de86f04a34023e52))
+* **tests:** now with tests and formatting ([a2635bb](https://github.com/danielkaldheim/pyairstage/commit/a2635bb974b6b0df6aa9565b60f50c9dc019cfb8))
+* **typing:** changing fan direction handling api ([ac02a6e](https://github.com/danielkaldheim/pyairstage/commit/ac02a6e8c7611fab6a50416f9ef24d7b6ed1cc88))
+* **typing:** trying to harden up our typing for clearer signatures / avoid resolving Nones ([f4cd5c2](https://github.com/danielkaldheim/pyairstage/commit/f4cd5c2c2a79f9b1524152a0f5de83bf016eaf20))
+
+
+### BREAKING CHANGES
+
+* **typing:** changing signatures to better leverage native types where appropriate
+
 ## [3.2.2](https://github.com/danielkaldheim/pyairstage/compare/v3.2.1...v3.2.2) (2026-08-06)
 
 
