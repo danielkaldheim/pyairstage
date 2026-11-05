@@ -1,3 +1,13 @@
+## [3.2.3](https://github.com/danielkaldheim/pyairstage/compare/v3.2.2...v3.2.3) (2026-11-05)
+
+
+### Bug Fixes
+
+* **cache:** getting rid of the base cache entirely, we're only storing known good values now in a 15 minutes ttl ([4561d0a](https://github.com/danielkaldheim/pyairstage/commit/4561d0aa534171ee37990e15bba259653ae45eb0))
+* **tests:** now with tests and formatting ([89544ef](https://github.com/danielkaldheim/pyairstage/commit/89544ef8a85517c735e3b7772ee330007c327be0))
+* **typing:** BREAKING CHANGE changing signatures to better leverage native types where appropriate ([294d8b5](https://github.com/danielkaldheim/pyairstage/commit/294d8b55fe524c1b6b273c416c00c4779571fa5d))
+* **typing:** trying to harden up our typing for clearer signatures / avoid resolving Nones ([f4cd5c2](https://github.com/danielkaldheim/pyairstage/commit/f4cd5c2c2a79f9b1524152a0f5de83bf016eaf20))
+
 ## [3.2.2](https://github.com/danielkaldheim/pyairstage/compare/v3.2.1...v3.2.2) (2026-08-06)
 
 
