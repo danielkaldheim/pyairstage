@@ -8,7 +8,6 @@ from pyairstage.airstageAC import AirstageAC, AirstageACError
 from pyairstage.airstageApi import ApiError, ApiLocal
 from pyairstage.constants import (
     ACParameter,
-    BooleanDescriptors,
     FanSpeedDescriptors,
     OperationMode,
     OperationModeDescriptors,
@@ -53,16 +52,16 @@ async def test_get_devices_shape(
 
 
 async def test_refresh_and_typed_getters(ac: AirstageAC) -> None:
-    assert ac.get_device_on_off_state() is BooleanDescriptors.ON
+    assert ac.get_device_on_off_state() is True
     assert ac.get_operating_mode() is OperationModeDescriptors.HEAT
     assert ac.get_fan_speed() is FanSpeedDescriptors.LOW
     assert ac.get_target_temperature() == 22.0
     assert ac.get_display_temperature() == pytest.approx(24.25)
     assert ac.get_outdoor_temperature() == pytest.approx(24.0)
-    assert ac.get_indoor_led() is BooleanDescriptors.ON
+    assert ac.get_indoor_led() is True
     assert ac.get_hmn_detection() is None  # 65535 -> capability unavailable
     assert ac.get_minimum_temperature() == 16.0
-    assert ac.get_num_vertical_swing_positions() == 4
+    assert ac.get_num_vertical_positions() == 4
 
 
 async def test_turn_off_sends_boolean(ac: AirstageAC, dongle: FakeDongle) -> None:

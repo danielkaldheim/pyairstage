@@ -66,7 +66,7 @@ class AirstageAC:
             parameterName is ACParameter.INDOOR_TEMPERATURE
             or parameterName is ACParameter.OUTDOOR_TEMPERATURE
         ):
-            value = (int(value) - 5000) / 100
+            return (int(value) - 5000) / 100
         try:
             # Always attempt to convert to a int
             return int(value)
@@ -116,12 +116,12 @@ class AirstageAC:
 
     def get_operating_mode(self) -> OperationModeDescriptors | None:
         if self._is_capability_available(ACParameter.ONOFF_MODE):
-          if int(self._get_device_parameter(ACParameter.ONOFF_MODE)) == 0:
-              return OperationModeDescriptors.OFF
-          if self._is_capability_available(ACParameter.OPERATION_MODE):
-              return VALUE_TO_OPERATION_MODE.get(
-                  int(self._get_device_parameter(ACParameter.OPERATION_MODE))
-              )
+            if int(self._get_device_parameter(ACParameter.ONOFF_MODE)) == 0:
+                return OperationModeDescriptors.OFF
+            if self._is_capability_available(ACParameter.OPERATION_MODE):
+                return VALUE_TO_OPERATION_MODE.get(
+                    int(self._get_device_parameter(ACParameter.OPERATION_MODE))
+                )
         return None
 
     async def set_operation_mode(self, mode: OperationMode):
