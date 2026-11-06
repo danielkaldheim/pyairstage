@@ -117,12 +117,13 @@ class AirstageAC:
         await self._set_boolean(ACParameter.ONOFF_MODE, False)
 
     def get_operating_mode(self) -> OperationModeDescriptors | None:
-        if int(self._get_device_parameter(ACParameter.ONOFF_MODE)) == 0:
-            return OperationModeDescriptors.OFF
-        if self._is_capability_available(ACParameter.OPERATION_MODE):
-            return VALUE_TO_OPERATION_MODE.get(
-                int(self._get_device_parameter(ACParameter.OPERATION_MODE))
-            )
+        if self._is_capability_available(ACParameter.ONOFF_MODE):
+          if int(self._get_device_parameter(ACParameter.ONOFF_MODE)) == 0:
+              return OperationModeDescriptors.OFF
+          if self._is_capability_available(ACParameter.OPERATION_MODE):
+              return VALUE_TO_OPERATION_MODE.get(
+                  int(self._get_device_parameter(ACParameter.OPERATION_MODE))
+              )
         return None
 
     async def set_operation_mode(self, mode: OperationMode):
