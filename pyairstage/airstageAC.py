@@ -119,9 +119,11 @@ class AirstageAC:
     def get_operating_mode(self) -> OperationModeDescriptors | None:
         if int(self._get_device_parameter(ACParameter.ONOFF_MODE)) == 0:
             return OperationModeDescriptors.OFF
-        return VALUE_TO_OPERATION_MODE.get(
-            int(self._get_device_parameter(ACParameter.OPERATION_MODE))
-        )
+        if self._is_capability_available(ACParameter.OPERATION_MODE):
+            return VALUE_TO_OPERATION_MODE.get(
+                int(self._get_device_parameter(ACParameter.OPERATION_MODE))
+            )
+        return None
 
     async def set_operation_mode(self, mode: OperationMode):
         if not isinstance(mode, OperationMode):
@@ -129,9 +131,11 @@ class AirstageAC:
         await self._set_device_parameter(ACParameter.OPERATION_MODE, mode)
 
     def get_fan_speed(self) -> FanSpeedDescriptors | None:
-        return VALUE_TO_FAN_SPEED.get(
-            int(self._get_device_parameter(ACParameter.FAN_SPEED))
-        )
+        if self._is_capability_available(ACParameter.FAN_SPEED):
+            return VALUE_TO_FAN_SPEED.get(
+                int(self._get_device_parameter(ACParameter.FAN_SPEED))
+            )
+        return None
 
     async def set_fan_speed(self, fan_speed: FanSpeed):
         if not isinstance(fan_speed, FanSpeed):
