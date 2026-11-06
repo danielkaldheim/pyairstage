@@ -1,3 +1,11 @@
+## [4.0.3](https://github.com/danielkaldheim/pyairstage/compare/v4.0.2...v4.0.3) (2026-11-06)
+
+
+### Bug Fixes
+
+* **constants:** pulling back CAPABILITY_NOT_AVAILABLE, that was a mistake ([6dc9609](https://github.com/danielkaldheim/pyairstage/commit/6dc9609cd56098a52f4c84e1515695aaee1ab414))
+* **hardening:** more api hardening ([c3004a2](https://github.com/danielkaldheim/pyairstage/commit/c3004a2eab61f0856c259fa0254e56a1ceebe652))
+
 ## [4.0.2](https://github.com/danielkaldheim/pyairstage/compare/v4.0.1...v4.0.2) (2026-11-06)
 
 
