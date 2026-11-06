@@ -1,5 +1,6 @@
 import enum
 
+CAPABILITY_NOT_AVAILABLE = "65535"
 
 class OperationMode(enum.IntEnum):
     AUTO = 0

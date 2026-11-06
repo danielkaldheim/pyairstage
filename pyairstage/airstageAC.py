@@ -10,8 +10,6 @@ DATA_TYPES = int | float | str | bool
 
 _LOGGER = logging.getLogger(__name__)
 
-_CAPABILITY_NOT_AVAILABLE = "65535"
-
 
 class AirstageACError(Exception):
     """Airstage AC Error"""
@@ -51,7 +49,7 @@ class AirstageAC:
                 value = parameter["value"]
                 parameter_name = ACParameter(name)
 
-                if value != _CAPABILITY_NOT_AVAILABLE:
+                if value != CAPABILITY_NOT_AVAILABLE:
                     self._lastGoodValue[parameter_name] = value
             except ValueError as e:
                 _LOGGER.debug("Error processing parameter: %s", e)
