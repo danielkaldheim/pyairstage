@@ -1,3 +1,10 @@
+## [4.0.2](https://github.com/danielkaldheim/pyairstage/compare/v4.0.1...v4.0.2) (2026-11-06)
+
+
+### Bug Fixes
+
+* **fan speed:** adding more hardening to fan speed & operation modes as a just in case ([190f383](https://github.com/danielkaldheim/pyairstage/commit/190f383a06c251b9f4cefefc6082940d279dd620))
+
 ## [4.0.1](https://github.com/danielkaldheim/pyairstage/compare/v4.0.0...v4.0.1) (2026-11-05)
 
 
