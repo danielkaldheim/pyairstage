@@ -3,12 +3,15 @@
 from __future__ import annotations
 
 import json
+import logging
 import threading
 import time
 from collections.abc import Mapping
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from types import TracebackType
 from typing import Any, TypeAlias, TypedDict
+
+_LOGGER = logging.getLogger(__name__)
 
 DEVICE_ID: str = "106838E4F507"
 MODEL: str = "ASUH07LPTA"
@@ -112,8 +115,12 @@ class FakeDongle:
             def log_message(self, format: str, *args: Any) -> None:
                 pass
 
+            def log_error(self, format: str, *args: Any) -> None:
+                _LOGGER.warning(format % args)
+
         self._server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
         self._server.daemon_threads = True
+
         self._thread = threading.Thread(
             target=self._server.serve_forever, daemon=True, name="fake-dongle"
         )

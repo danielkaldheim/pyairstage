@@ -20,7 +20,9 @@ HEADER_AUTHORIZATION = "Authorization"
 class AirstageApi:
     """Airstage API"""
 
-    async def get_devices(self) -> dict[str, dict]:
+    async def get_devices(
+        self, parameters: list[ACParameter], pause: timedelta
+    ) -> dict[str, dict]:
         """Get account devices"""
 
     async def set_parameter(self, dsn: str, name: str, value: str):
@@ -122,7 +124,9 @@ class ApiCloud(AirstageApi):
         f.write(json.dumps(response))
         return access_token
 
-    async def get_devices(self) -> dict[str, dict]:
+    async def get_devices(
+        self, parameters: list[ACParameter] = [], pause=timedelta(seconds=0)
+    ) -> dict[str, dict]:
         access_token = await self._read_token()
         response = await self.async_call_api(
             "GET",
@@ -263,7 +267,7 @@ class ApiLocal(AirstageApi):
             parameters = [ACParameter.MODEL] + parameters
         # We cannot request more than 20 parameters at once, not sure if other devices are different
         chunks = math.ceil(len(parameters) / 20)
-        items_per_chunk = len(parameters) / chunks
+        items_per_chunk = int(len(parameters) / chunks)
         results = {}
         last_fetch = 0
         while last_fetch < len(parameters):
@@ -275,6 +279,7 @@ class ApiLocal(AirstageApi):
                 last_fetch : min(last_fetch + items_per_chunk, len(parameters))
             ]
             chunk_results = await self.get_parameters(chunk)
+            last_fetch = last_fetch + len(chunk_results)
             results = results | chunk_results
 
         formattedResults = [
