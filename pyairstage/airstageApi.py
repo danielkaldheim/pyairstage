@@ -272,7 +272,7 @@ class ApiLocal(AirstageApi):
                 # A lite pause fixes that though
                 await asyncio.sleep(pause.total_seconds())
             chunk = parameters[
-                last_fetch : math.min(last_fetch + items_per_chunk, len(parameters))
+                last_fetch : min(last_fetch + items_per_chunk, len(parameters))
             ]
             chunk_results = await self.get_parameters(chunk)
             results = results | chunk_results
