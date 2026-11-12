@@ -1,13 +1,15 @@
 import asyncio
+from datetime import timedelta
 import json
 import logging
+import math
 import os
 import time
 import uuid
 
 import aiohttp
 
-from .constants import ACParameter
+from .constants import ACParameter, DEFAULT_PARAMTER_COLLECTION
 
 HEADER_CONTENT_TYPE = "Content-Type"
 HEADER_USER_AGENT = "User-Agent"
@@ -251,64 +253,47 @@ class ApiLocal(AirstageApi):
         self.ip_address = ip_address
         self.protocol = "https" if use_https else "http"
 
-    async def get_devices(self) -> dict[str, dict]:
-        acInfo = await self.get_parameters(
-            [
-                ACParameter.MODEL,
-                ACParameter.INDOOR_LED,
-                ACParameter.INDOOR_TEMPERATURE,
-                ACParameter.OUTDOOR_TEMPERATURE,
-                ACParameter.POWER_CONSUMPTION,
-            ],
-        )
+    async def get_devices(
+        self,
+        parameters: list[ACParameter] = DEFAULT_PARAMETER_COLLECTION,
+        pause=timedelta(seconds=1),
+    ) -> dict[str, dict]:
+        if ACParameter.MODEL not in parameters:
+            # Model needs to be known for the established return body
+            parameters = [ACParameter.MODEL] + parameters
+        # We cannot request more than 20 parameters at once, not sure if other devices are different
+        chunks = math.ceil(len(parameters) / 20)
+        items_per_chunk = len(parameters) / chunks
+        results = {}
+        last_fetch = 0
+        while last_fetch < len(parameters):
+            if last_fetch != 0:
+                # We cannot request more than 20 parameters at once and doing 2 back to back requests results in a disconnected error on the first attempt
+                # A lite pause fixes that though
+                await asyncio.sleep(pause.total_seconds())
+            chunk = parameters[
+                last_fetch : math.min(last_fetch + items_per_chunk, len(parameters))
+            ]
+            chunk_results = await self.get_parameters(chunk)
+            results = results | chunk_results
 
-        # We cannot request more than 20 parameters at once and doing 2 back to back requests results in a disconnected error on the first attempt
-        # A lite pause fixes that though
-        await asyncio.sleep(1)
-        modeInfo = await self.get_parameters(
-            [
-                ACParameter.HMN_DETECTION,
-                ACParameter.ONOFF_MODE,
-                ACParameter.OPERATION_MODE,
-                ACParameter.FAN_SPEED,
-                ACParameter.TARGET_TEMPERATURE,
-                ACParameter.VERTICAL_SWING_POSITIONS,
-                ACParameter.VERTICAL_DIRECTION,
-                ACParameter.VERTICAL_SWING,
-                ACParameter.HORIZONTAL_DIRECTION,
-                ACParameter.HORIZONTAL_SWING,
-                ACParameter.OUTDOOR_LOW_NOISE,
-                ACParameter.ENERGY_SAVE_FAN,
-                ACParameter.HMN_DETECTION_AUTO_SAVE,
-                ACParameter.MINIMUM_HEAT,
-                ACParameter.POWERFUL_MODE,
-                ACParameter.ECONOMY_MODE,
-                ACParameter.ERROR_CODE,
-                ACParameter.DEMAND,
-                ACParameter.SIGN_RESET,
-            ],
-        )
-
-        parameters = acInfo | modeInfo
-
-        formattedParameters = []
-        for key in parameters:
-            formattedParameters.append(
-                {"name": key, "value": parameters[key], "modifiedAt": ""}
-            )
+        formattedResults = [
+            {"name": key, "value": results[key], "modifiedAt": ""}
+            for key in results.keys()
+        ]
 
         devices = {}
 
         model = "Airstage"
-        if ACParameter.MODEL in parameters:
-            model = parameters[ACParameter.MODEL]
+        if ACParameter.MODEL in results:
+            model = results[ACParameter.MODEL]
 
         devices[self.device_id] = {
             "isSubuser": False,
             "deviceId": self.device_id,
             "deviceName": self.device_id,
             "model": model,
-            "parameters": formattedParameters,
+            "parameters": formattedResults,
         }
 
         _LOGGER.debug(devices)

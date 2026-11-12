@@ -87,8 +87,6 @@ class ACParameter(enum.StrEnum):
 
     POWER_CONSUMPTION = "iu_pow_cons"
 
-    REFRESH_READ_PROPERTIES = "get_prop"
-
     VERTICAL_SWING = "iu_af_swg_vrt"
     VERTICAL_SWING_POSITIONS = "iu_af_inc_vrt"
     VERTICAL_DIRECTION = "iu_af_dir_vrt"
@@ -105,19 +103,182 @@ class ACParameter(enum.StrEnum):
 
     MINIMUM_HEAT = "iu_min_heat"
 
-    # # below are readonly properties
-    # DISPLAY_TEMPERATURE = "display_temperature"
-    # # Unclear what this does, seems to somewhat correlate to af_vertical_direction but not entirely
-    # VERTICAL_SWING_POSITION = "af_vertical_num_dir"
-    DEVICE_NAME = "deviceName"
     MODEL = "iu_model"
 
     ERROR_CODE = "iu_err_code"
     DEMAND = "iu_demand"
     SIGN_RESET = "iu_fltr_sign_reset"
 
+    # full list of known parameters as a reference (note: many not actually populated, at least on my units)
+    # iu_af_dir_cntr_hrz
+    # iu_af_dir_cntr_vrt
+    # iu_af_dir_hrz
+    # iu_af_dir_side_hrz
+    # iu_af_dir_side_vrt
+    # iu_af_dir_vrt
+    # iu_af_fan_pattern
+    # iu_af_inc_hrz
+    # iu_af_inc_vrt
+    # iu_af_swg_hrz
+    # iu_af_swg_vrt
+    # iu_ai_auto_fnc
+    # iu_ai_eco
+    # iu_ai_eco_jp
+    # iu_ai_ecosw_jp
+    # iu_ai_fnc
+    # iu_ai_group_id
+    # iu_ai_hist
+    # iu_ai_infr
+    # iu_ai_infr_chg
+    # iu_ai_sug_time
+    # iu_ai_time_h
+    # iu_ai_time_m
+    # iu_ai_timer
+    # iu_ai_timer_fnc
+    # iu_ai_timer_stat
+    # iu_anti_frz
+    # iu_auto_clean_jp
+    # iu_auto_off_time
+    # iu_auto_save_time
+    # iu_buzzer
+    # iu_clean_sug
+    # iu_cmp_time
+    # iu_coil_dry
+    # iu_comf_af
+    # iu_consign
+    # iu_demand
+    # iu_dev_cap
+    # iu_drain_pump
+    # iu_dry_adj
+    # iu_dry_cool_jp
+    # iu_dry_type
+    # iu_economy
+    # iu_eeprom
+    # iu_eeprom_fw_ota_path
+    # iu_eeprom_model_name
+    # iu_eeprom_ver
+    # iu_eep_ver
+    # iu_eng_time
+    # iu_err_code
+    # iu_fan
+    # iu_fan_ctrl
+    # iu_fan_rot
+    # iu_fan_side_spd
+    # iu_fan_spd
+    # iu_fld_set
+    # iu_fld_set_start
+    # iu_fltr_sign_reset
+    # iu_fltr_time
+    # iu_force_dump
+    # iu_frz_prev
+    # iu_fw_fw_ota_path
+    # iu_has_af_wide
+    # iu_has_ai_eco
+    # iu_has_ai_timer
+    # iu_has_auto_clean
+    # iu_has_comf_af
+    # iu_has_fld_set
+    # iu_has_heat_ster
+    # iu_has_hmd_snsr
+    # iu_has_mtim
+    # iu_has_srv_mntr
+    # iu_has_tmp_lmt
+    # iu_has_upd_eep
+    # iu_has_upd_main
+    # iu_has_watch
+    # iu_heat_ex_tmp
+    # iu_heat_ster
+    # iu_hmd
+    # iu_hmn_det
+    # iu_hmn_det_auto_off
+    # iu_hmn_det_auto_save
+    # iu_indoor_tmp
+    # iu_indoor_tmp_crct
+    # iu_int_op_mode
+    # iu_main
+    # iu_main_model_name
+    # iu_main_ver
+    # iu_malfnc_detail
+    # iu_malfnc_disp
+    # iu_malfnc_disp_
+    # iu_malfnc_stat
+    # iu_min_heat
+    # iu_mnt_icon
+    # iu_model
+    # iu_monitor
+    # iu_mtim
+    # iu_mtim_stat
+    # iu_obj
+    # iu_onoff
+    # iu_on_timer_sug
+    # iu_op_mode
+    # iu_op_stat
+    # iu_outdoor_tmp
+    # iu_polling_data
+    # iu_pow_cons
+    # iu_powerful
+    # iu_pow_inf_yest
+    # iu_push_ntfy
+    # iu_room
+    # iu_schedule_execute
+    # iu_set_tmp
+    # iu_set_tmp_
+    # iu_side_fan
+    # iu_side_fan_fnc
+    # iu_suct_tmp
+    # iu_test_op
+    # iu_tmp_hi_auto
+    # iu_tmp_hi_cool
+    # iu_tmp_hi_heat
+    # iu_tmp_inc
+    # iu_tmp_lo_auto
+    # iu_tmp_lo_cool
+    # iu_tmp_lo_heat
+    # iu_watch_stat
+    # iu_wifi_led
+    # ou_cmp_freq
+    # ou_current
+    # ou_disc_tmp
+    # ou_exp_vlv
+    # ou_fan
+    # ou_fan_rot
+    # ou_four_way_vlv
+    # ou_heat_ex_tmp
+    # ou_heat_ex_tmp_out
+    # ou_low_noise
+    # ou_model
+    # ou_outdoor_tmp
+
     def __str__(self):
         return self._value_
+
+
+DEFAULT_PARAMETER_COLLECTION = [
+    ACParameter.MODEL,
+    ACParameter.INDOOR_LED,
+    ACParameter.INDOOR_TEMPERATURE,
+    ACParameter.OUTDOOR_TEMPERATURE,
+    ACParameter.POWER_CONSUMPTION,
+    ACParameter.HMN_DETECTION,
+    ACParameter.ONOFF_MODE,
+    ACParameter.OPERATION_MODE,
+    ACParameter.FAN_SPEED,
+    ACParameter.TARGET_TEMPERATURE,
+    ACParameter.VERTICAL_SWING_POSITIONS,
+    ACParameter.VERTICAL_DIRECTION,
+    ACParameter.VERTICAL_SWING,
+    ACParameter.HORIZONTAL_DIRECTION,
+    ACParameter.HORIZONTAL_SWING,
+    ACParameter.OUTDOOR_LOW_NOISE,
+    ACParameter.ENERGY_SAVE_FAN,
+    ACParameter.HMN_DETECTION_AUTO_SAVE,
+    ACParameter.MINIMUM_HEAT,
+    ACParameter.POWERFUL_MODE,
+    ACParameter.ECONOMY_MODE,
+    ACParameter.ERROR_CODE,
+    ACParameter.DEMAND,
+    ACParameter.SIGN_RESET,
+]
 
 
 class ACConstants:
