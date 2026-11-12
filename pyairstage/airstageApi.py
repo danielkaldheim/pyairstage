@@ -9,7 +9,7 @@ import uuid
 
 import aiohttp
 
-from .constants import ACParameter, DEFAULT_PARAMTER_COLLECTION
+from .constants import ACParameter, DEFAULT_PARAMETER_COLLECTION
 
 HEADER_CONTENT_TYPE = "Content-Type"
 HEADER_USER_AGENT = "User-Agent"
