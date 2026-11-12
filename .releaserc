@@ -4,8 +4,8 @@
             "name": "master"
         },
         {
-            "name": "next",
-            "channel": "next"
+            "name": "beta",
+            "prerelease": true
         }
     ],
     "plugins": [
